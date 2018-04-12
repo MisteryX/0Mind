@@ -1,0 +1,20 @@
+{
+	"id": 1,
+	"host": "127.0.0.1",
+	"port": 5885,
+	"model_types": ["caffe2"],
+	"tasks": [
+		{
+			"id": 1,
+			"model_type": "caffe2",
+			"model_file": "ML/models/bvlc_alexnet.caffe2",
+			"input_filters": {
+				"data": ["i_img_file_to_caffe2.ImageFileCaffe2Filter"]
+			},
+			"output_filters": {
+				"default": ["io_argmax.ArgMaxFilter"]
+			}
+		}
+	],
+	"debug": true
+}

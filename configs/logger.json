@@ -1,0 +1,28 @@
+{
+  "name": "test",
+  "logger_config": {
+	"version": 1,
+	"handlers": {
+	  "default": {
+		"class": "logging.handlers.RotatingFileHandler",
+		"filename": "logs/test.log",
+		"formatter": "default",
+		"maxBytes": 1024000,
+		"backupCount": 5
+	  }
+	},
+	"formatters": {
+	  "default": {
+		"format": "[%(asctime)s][%(name)s][%(levelname)s]: %(message)s",
+		"datefmt": "%Y-%m-%d %H:%M:%S"
+	  }
+	},
+	"loggers": {
+	  "": {
+		"handlers": ["default"],
+        "level": "INFO",
+        "propagate": true
+	  }
+	}
+  }
+}
