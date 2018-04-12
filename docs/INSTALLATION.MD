@@ -2,7 +2,7 @@
 
 Go to the directory where 0Mind should be.
 ```
-git clone git@github.com:0Mind .
+git clone git@github.com:MisteryX/0Mind.git .
 ```
 Now you have all files of the project in the directory **0Mind**. After that you should install all required packages.
 ```
