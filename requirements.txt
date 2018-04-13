@@ -1,7 +1,4 @@
 numpy
 keras
-tensorflow
-redis
-requests
 tornado
 psutil
