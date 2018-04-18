@@ -22,7 +22,7 @@ class ModelDropHandler(ModelHandler):
 
 		model_id = self.get_model_id()
 
-		self.get_service().log().append('DROP', '{}: received request to drop the model id [{}]'.format(self.__class__.__name__, model_id))
+		self.get_service().log().append('{}: received request to drop the model id [{}]'.format(self.__class__.__name__, model_id))
 		process = psutil.Process()
 		memory_overview_before = process.memory_info()
 		profiler = Profiler()

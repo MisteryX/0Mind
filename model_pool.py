@@ -33,12 +33,12 @@ class ModelPool(Service):
 		super(ModelPool, self).__init__(id=id, host=host, port=port, tasks=tasks, **options)
 
 		models_count = self.__load_models()
-		self.log().append('INFO', '{} models loaded to {}'.format(models_count, self.__class__.__name__))
+		self.log().append('{} models loaded to {}'.format(models_count, self.__class__.__name__))
 
 		self._init_service()
 
 	def _init_service(self):
-		self.log().append('INIT', 'Starting server on port {}'.format(self.get_port()))
+		self.log().append('Starting server on port {}'.format(self.get_port()))
 		__server = tornado.web.Application(
 			[
 				(r"/info", MainHandler, {'service': self}),
@@ -55,11 +55,11 @@ class ModelPool(Service):
 		)
 		__server.listen(self.get_port(), address=self.get_host())
 		self.set_server(__server)
-		self.log().append('READY', '{}:{} service is ready to run'.format(self.__class__.__name__, self.get_id()))
+		self.log().append('{}:{} service is ready to run'.format(self.__class__.__name__, self.get_id()))
 
 	def __append_model(self, _id: str, model: BaseModel):
 		self.__models[_id] = model
-		self.log().append('LOAD', 'Model id [{}] has been loaded successfully'.format(_id))
+		self.log().append('Model id [{}] has been loaded successfully'.format(_id))
 
 	def load_model(self, task: dict, validate=True, raise_exception=False)->bool:
 		try:
@@ -71,7 +71,7 @@ class ModelPool(Service):
 			if self.get_option('model_types') and task['model_type'] not in self.get_option('model_types'):
 				raise Exception('Task id [{}] has unsupported type [{}] so can`t be loaded'.format(task['id'], task['model_type']))
 
-			self.log().append('LOADING', 'Loading the task: {}'.format(str(task)))
+			self.log().append('Loading the task: {}'.format(str(task)))
 
 			model = ModelFactory().get_model(**task)
 
@@ -80,7 +80,7 @@ class ModelPool(Service):
 			self.__append_model(task['id'], model)
 			self.model_list_check_sum_update()
 		except Exception as ex:
-			self.log().append('ERROR', ', '.join(ex.args), log.ERROR)
+			self.log().append(', '.join(ex.args), log.ERROR)
 			if raise_exception:
 				raise Exception(', '.join(ex.args))
 			else:
@@ -88,13 +88,13 @@ class ModelPool(Service):
 		return True
 
 	def unload_model(self, model_id)->bool:
-		self.log().append('UNLOADING', 'Unloading the model id: [{}]'.format(model_id))
+		self.log().append('Unloading the model id: [{}]'.format(model_id))
 		result = self.__drop_model(model_id)
 		if result:
-			self.log().append('UNLOADING', 'The model id [{}] has been successfully unloaded'.format(model_id))
+			self.log().append('The model id [{}] has been successfully unloaded'.format(model_id))
 			self.model_list_check_sum_update()
 		else:
-			self.log().append('UNLOADING', 'The model id [{}] has not been unloaded'.format(model_id))
+			self.log().append('The model id [{}] has not been unloaded'.format(model_id))
 		return result
 
 	def __drop_model(self, model_id)->bool:
@@ -103,10 +103,10 @@ class ModelPool(Service):
 
 	def __load_models(self, a_tasks=None)->int:
 		models_count = 0
-		self.log().append('LOADING', 'Loading models')
+		self.log().append('Loading models')
 		tasks = a_tasks if a_tasks else self.get_tasks()
 		if not tasks:
-			self.log().append('EMPTY', 'Task list is empty')
+			self.log().append('Task list is empty')
 			return models_count
 
 		for task in tasks:

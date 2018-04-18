@@ -46,24 +46,13 @@ class EventLog:
 
 		log.config.dictConfig(self.__config['logger_config'])
 
-		self.append('INITIATED', 'Logger INIT')
+		self.append('Logger INIT')
 
 	def get_name(self):
 		return self.__name
 
-	def append(self, status: str, message='', log_level=log.INFO):
+	def append(self, message='', log_level=log.INFO):
 		result = False
-		if self.__redis is not None:
-			status_key = self.__get_redis_key()
-			result = self.__redis.hmset(
-				status_key,
-				{
-					'edited_at': datetime.today().isoformat(),
-					'status': status,
-					'note': message,
-					'pid': os.getpid()
-				}
-			)
 		_logger = self.get_logger()
 		if _logger is not None:
 			_logger.log(log_level, message)

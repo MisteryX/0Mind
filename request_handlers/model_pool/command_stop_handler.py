@@ -16,7 +16,7 @@ class CommandStopHandler(BaseHandler):
 	_attributes = ['pool_id']
 
 	async def post(self, *args, **kwargs):
-		self._service.log().append('COMMAND', 'Received command [stop]')
+		self._service.log().append('Received command [stop]')
 
 		pool_id = int(self._data.get('pool_id', None)) if self._data else None
 		if self._service.get_id() != pool_id:

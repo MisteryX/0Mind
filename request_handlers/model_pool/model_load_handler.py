@@ -30,7 +30,7 @@ class ModelLoadHandler(BaseHandler):
 			self._raise_error(500, '{}: Model id [{}] has been already loaded in this pool'.format(self.__class__.__name__, model_id))
 
 		try:
-			self.get_service().log().append('LOADING', '{}: received request to load the model id [{}]'.format(self.__class__.__name__, model_id))
+			self.get_service().log().append('{}: received request to load the model id [{}]'.format(self.__class__.__name__, model_id))
 			process = psutil.Process()
 			memory_overview = process.memory_info()
 			profiler = Profiler()

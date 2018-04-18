@@ -45,7 +45,7 @@ class BaseHandler(tornado.web.RequestHandler):
 				)
 
 	def _raise_error(self, http_code: int, message: str):
-		self._service.log().append('ERROR', message, log.ERROR)
+		self._service.log().append(message, log.ERROR)
 		self.set_status(http_code)
 		self.write({'error': message})
 		self.finish()

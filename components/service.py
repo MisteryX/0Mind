@@ -42,7 +42,7 @@ class Service(ABC):
 		self._event_log = EventLog(name=self.get_name())
 		self._process = psutil.Process(pid=os.getpid())
 		self.get_process().cpu_percent()
-		self.log().append('INIT', 'Initializing service on port {}'.format(self.get_port()))
+		self.log().append('Initializing service on port {}'.format(self.get_port()))
 
 	@abstractmethod
 	def _init_service(self):
@@ -115,7 +115,6 @@ class Service(ABC):
 			response = self._get_response_from_url(self._get_service_ping_url(service))
 			if response.error:
 				self.log().append(
-					'ERROR',
 					'Ping of model pool id [{}] failed - {}: {}'.format(service.get('id'), response.code, response.body),
 					log.ERROR
 				)
@@ -123,14 +122,12 @@ class Service(ABC):
 			data = tornado.escape.json_decode(response.body)
 			if 'id' not in data:
 				self.log().append(
-					'ERROR',
 					'Ping of model pool id [{}]: result has no attribute [id]'.format(service.get('id')),
 					log.ERROR
 				)
 				return False
 			elif 'id' in data and data.get('id') != service.get('id'):
 				self.log().append(
-					'ERROR',
 					'Ping of model pool id [{}]: service has returned [id] = {}'.format(service.get('id'), data.get('id')),
 					log.ERROR
 				)
@@ -138,7 +135,6 @@ class Service(ABC):
 			return True
 		except Exception as ex:
 			self.log().append(
-				'ERROR',
 				'Ping of model pool id [{}] failed: {}'.format(service.get('id'), str(ex.args)),
 				log.ERROR
 			)
@@ -215,18 +211,18 @@ class Service(ABC):
 		if self._scheduler_tasks:
 			for task in self._scheduler_tasks:
 				task.start()
-			self.log().append('RUN', 'Run scheduled periodic tasks for {}'.format(self.__class__.__name__))
+			self.log().append('Run scheduled periodic tasks for {}'.format(self.__class__.__name__))
 
 		if self._server:
-			self.log().append('RUN', '{} run on port {}'.format(self.__class__.__name__, self._port))
+			self.log().append('{} run on port {}'.format(self.__class__.__name__, self._port))
 			tornado.ioloop.IOLoop.current().start()
 
 	def stop(self):
 		if self._scheduler_tasks:
 			for task in self._scheduler_tasks:
 				task.stop()
-			self.log().append('STOP', 'Scheduled periodic tasks stopped for {}'.format(self.__class__.__name__))
-		self.log().append('STOP', 'Stopping the server on port {}'.format(self._port))
+			self.log().append('Scheduled periodic tasks stopped for {}'.format(self.__class__.__name__))
+		self.log().append('Stopping the server on port {}'.format(self._port))
 		io_loop = tornado.ioloop.IOLoop.current()
 		io_loop.add_callback(io_loop.stop)
 
