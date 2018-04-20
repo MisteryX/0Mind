@@ -8,7 +8,6 @@ __version__ = "1.0.0"
 __maintainer__ = "Maxim Morskov"
 __site__ = "http://0mind.net"
 
-import json
 from abc import ABC, abstractmethod
 import ML
 from helpers.file_helper import *
@@ -60,23 +59,6 @@ class BaseModel(ABC):
 
 	def has_errors(self):
 		return len(self.get_errors()) > 0
-
-	@staticmethod
-	def show_errors(error_dict=None, json_out=True):
-		if error_dict is None:
-			error_dict = {}
-		output = {'errors': error_dict}
-		if json_out:
-			print(json.dumps(output))
-		else:
-			print(output)
-
-	def show_current_errors(self, error_dict=None, json_out=True):
-		if error_dict:
-			errors = error_dict
-		else:
-			errors = self.get_errors()
-		BaseModel.show_errors(errors, json_out)
 
 	def get_specification(self):
 		return {

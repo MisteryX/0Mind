@@ -4,7 +4,7 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __site__ = "http://0mind.net"
 
@@ -15,6 +15,7 @@ from helpers.file_helper import *
 from tornado import web
 from ML.model_factory import ModelFactory
 from components.service import Service
+from components.mind_exception import *
 from request_handlers.core.main_handler import *
 from request_handlers.core.system_info_handler import *
 from request_handlers.core.task_info_handler import *
@@ -30,10 +31,10 @@ class ModelPool(Service):
 	__models = {}
 
 	def __init__(self, id, host, port, tasks, **options):
-		super(ModelPool, self).__init__(id=id, host=host, port=port, tasks=tasks, **options)
+		super().__init__(id=id, host=host, port=port, tasks=tasks, **options)
 
 		models_count = self.__load_models()
-		self.log().append('{} models loaded to {}'.format(models_count, self.__class__.__name__))
+		self.log().append('{} model(s) was(were) loaded to {}'.format(models_count, self.__class__.__name__))
 
 		self._init_service()
 
@@ -66,10 +67,22 @@ class ModelPool(Service):
 			if validate:
 				is_task_valid, wrong_attribute = self._is_dictionary_valid(task, self.get_pool_task_attributes())
 				if not is_task_valid:
-					raise Exception('Compulsory task attribute [{}] not found in the task {}'.format(wrong_attribute, str(task)))
+					raise MindException(
+						MindError(
+							MindError.CODE_TASK_VALIDATION,
+							'Compulsory task attribute [{}] not found in the task {}',
+							[wrong_attribute, str(task)]
+						)
+					)
 
 			if self.get_option('model_types') and task['model_type'] not in self.get_option('model_types'):
-				raise Exception('Task id [{}] has unsupported type [{}] so can`t be loaded'.format(task['id'], task['model_type']))
+				raise MindException(
+					MindError(
+						MindError.CODE_UNSUPPORTED_MODEL_TYPE,
+						'Task id [{}] has unsupported type [{}] so can`t be loaded',
+						[task['id'], task['model_type']]
+					)
+				)
 
 			self.log().append('Loading the task: {}'.format(str(task)))
 
@@ -82,7 +95,16 @@ class ModelPool(Service):
 		except Exception as ex:
 			self.log().append(', '.join(ex.args), log.ERROR)
 			if raise_exception:
-				raise Exception(', '.join(ex.args))
+				if not isinstance(ex, MindException):
+					raise MindException(
+						MindError(
+							MindError.CODE_UNKNOWN,
+							', '.join(ex.args),
+							ex.args
+						)
+					)
+				else:
+					raise ex
 			else:
 				return False
 		return True

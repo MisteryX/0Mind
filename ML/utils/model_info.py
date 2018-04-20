@@ -14,11 +14,21 @@ def create_parser():
 	return parser
 
 
+def show_errors(error_dict=None, json_out=True):
+		if error_dict is None:
+			error_dict = {}
+		output = {'errors': error_dict}
+		if json_out:
+			print(json.dumps(output))
+		else:
+			print(output)
+
+
 def main(params):
 	model = ModelFactory().get_model(params.model_file)
 
 	if model.has_errors():
-		model.show_errors(model.get_errors())
+		show_errors(model.get_errors())
 		return
 	spec = model.get_specification()
 	if params.json_out:
