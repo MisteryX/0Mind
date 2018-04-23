@@ -4,11 +4,12 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __site__ = "http://0mind.net"
 
 from ML.filters.base_filter import BaseFilter
+from components.mind_exception import *
 from keras.preprocessing import sequence
 import numpy as np
 
@@ -18,7 +19,11 @@ class VectorPaddingToInputFilter(BaseFilter):
 	def _apply(self):
 		filtered_data = []
 		if self.get_type() != 'input':
-			self.get_model().set_error('filter', '{}: can be used only as an input filter'.format(self.__class__.__name__))
+			self.get_model().set_error(MindError(
+				MindError.CODE_FILTER_WRONG_TYPE,
+				'{}: can be used only as an input filter',
+				[self.__class__.__name__]
+			))
 			return filtered_data
 
 		inputs = self.get_model().get_inputs()

@@ -8,16 +8,17 @@ __version__ = "1.0.0"
 __maintainer__ = "Maxim Morskov"
 __site__ = "http://0mind.net"
 
+import importlib
+from importlib import util
 from abc import ABC, abstractmethod
 import ML
 from helpers.file_helper import *
 from ML.filters.o_default import DefaultFilter
-import importlib
-from importlib import util
+from components.mind_exception import *
 
 
 class BaseModel(ABC):
-	__errors = {}
+	__errors = []
 	__description = {}
 	__inputs = {}
 	__outputs = {}
@@ -51,14 +52,17 @@ class BaseModel(ABC):
 	def get_model_file(self):
 		return self.__model_file
 
-	def get_errors(self):
+	def get_errors(self)->list:
 		return self.__errors
 
 	def clear_errors(self):
 		self.__errors.clear()
 
-	def has_errors(self):
+	def has_errors(self)->bool:
 		return len(self.get_errors()) > 0
+
+	def set_error(self, error: MindError):
+		self.__errors.append(error)
 
 	def get_specification(self):
 		return {
@@ -97,26 +101,34 @@ class BaseModel(ABC):
 	def _set_description(self, key, value):
 		self.__description[key] = value
 
-	def set_error(self, err_type, err_message):
-		self.__errors[err_type] = err_message
-
 	def _is_input_data_valid(self, data):
 		inputs = self.get_inputs()
 		for input_id, input_ in inputs.items():
 			if input_.get('name', '') not in data:
-				self.set_error('input', 'Model input [{}] not found in the specified data'.format(input_.get('name', '')))
+				self.set_error(MindError(
+					MindError.CODE_MODEL_INPUT_NOT_FOUND_IN_DATA,
+					'Model input [{}] not found in the specified data',
+					[input_.get('name', '')]
+				))
 				return False
 		return True
 
 	def _load_model_from_file(self)->bool:
 		is_file_reachable, error_message = FileHelper.is_file_reachable(self.get_model_file(), True)
 		if not is_file_reachable:
-			self.set_error(self.__class__.__name__, error_message)
+			self.set_error(MindError(
+				MindError.CODE_MODEL_FILE_IS_UNREACHABLE,
+				error_message,
+				[self.__class__.__name__]
+			))
 			return False
 		try:
 			self._set_model(self.get_model_from_file(self.get_model_file()))
 		except Exception as ex:
-			self.set_error(self.__class__.__name__, ex.args)
+			self.set_error(MindError(
+				MindError.CODE_MODEL_LOAD_FAIL,
+				list(ex.args).insert(0, self.__class__.__name__)
+			))
 			return False
 		return True
 
@@ -169,7 +181,11 @@ class BaseModel(ABC):
 			elif output_id < len(predictions):
 				return predictions[output_id]
 			else:
-				self.set_error('after_prediction', '{}: Can`t determine output id for model prediction'.format(self.__class__.__name__))
+				self.set_error(MindError(
+					MindError.CODE_MODEL_OUTPUT_NOT_FOUND,
+					'{}: Can`t determine output id for model prediction',
+					[self.__class__.__name__]
+				))
 		elif type(predictions) is dict:
 			if output['name'] not in predictions:
 				self.set_error(

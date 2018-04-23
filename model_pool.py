@@ -78,7 +78,7 @@ class ModelPool(Service):
 			if self.get_option('model_types') and task['model_type'] not in self.get_option('model_types'):
 				raise MindException(
 					MindError(
-						MindError.CODE_UNSUPPORTED_MODEL_TYPE,
+						MindError.CODE_MODEL_UNSUPPORTED_TYPE,
 						'Task id [{}] has unsupported type [{}] so can`t be loaded',
 						[task['id'], task['model_type']]
 					)
@@ -100,7 +100,7 @@ class ModelPool(Service):
 						MindError(
 							MindError.CODE_UNKNOWN,
 							', '.join(ex.args),
-							ex.args
+							list(ex.args)
 						)
 					)
 				else:

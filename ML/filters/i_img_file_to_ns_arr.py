@@ -9,6 +9,7 @@ __maintainer__ = "Maxim Morskov"
 __site__ = "http://0mind.net"
 
 from ML.filters.base_filter import BaseFilter
+from components.mind_exception import *
 import numpy as np
 import os
 try:
@@ -22,14 +23,22 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 	def _apply(self):
 		filtered_data = []
 		if self.get_type() != 'input':
-			self.get_model().set_error('filter', '{}: can be used only as an input filter'.format(self.__class__.__name__))
+			self.get_model().set_error(MindError(
+				MindError.CODE_FILTER_WRONG_TYPE,
+				'{}: can be used only as an input filter',
+				[self.__class__.__name__]
+			))
 			return np.array(filtered_data)
 		for data_for_input in self.get_data():
 			if 'image_file' in data_for_input:
 				filtered_data.append(
 					self.__get_images_norm_and_scaled(data_for_input['image_file']))
 			else:
-				self.get_model().set_error('filter', '{}: image_file property missing'.format(self.__class__.__name__))
+				self.get_model().set_error(MindError(
+					MindError.CODE_FILTER_WRONG_PARAMS,
+					'{}: missing param [{}]',
+					[self.__class__.__name__, 'image_file']
+				))
 		return np.array(filtered_data)
 
 	def __get_images_norm_and_scaled(self, image_file_name: str):
@@ -38,7 +47,11 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 		target_channels = min(input_shape[1:])
 		target_size = tuple(list(filter(lambda item: item != target_channels, input_shape)))
 		if not os.path.isfile(image_file_name) or not os.access(image_file_name, os.R_OK):
-			self.get_model().set_error('filter', '{}: file {} is not accessible'.format(self.__class__.__name__, image_file_name))
+			self.get_model().set_error(MindError(
+				MindError.CODE_FILTER_FILE_IS_UNREACHABLE,
+				'{}: file [{}] is not accessible',
+				[self.__class__.__name__, image_file_name]
+			))
 			return
 		_image = Image.open(image_file_name)
 		_image = _image.resize(target_size, Image.ANTIALIAS)
