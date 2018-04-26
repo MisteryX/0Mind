@@ -4,9 +4,9 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"
 
 import importlib
 from importlib import util
@@ -18,18 +18,21 @@ from components.mind_exception import *
 
 
 class BaseModel(ABC):
-	__errors = []
-	__description = {}
-	__inputs = {}
-	__outputs = {}
-	__model_file = ''
+	__errors = None
+	__description = None
+	__inputs = None
+	__outputs = None
+	__model_file = None
 	__model = None
 	__input_filters = None
 	__output_filters = None
 
 	@abstractmethod
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None):
-		self.clear_errors()
+		self.__errors = []
+		self.__description = {}
+		self.__inputs = {}
+		self.__outputs = {}
 		self.__model_file = model_file
 		self.__input_filters = {} if input_filters is None else input_filters
 		self.__output_filters = {} if output_filters is None else output_filters
@@ -63,6 +66,9 @@ class BaseModel(ABC):
 
 	def set_error(self, error: MindError):
 		self.__errors.append(error)
+
+	def set_errors(self, errors: list):
+		self.__errors.extend(errors)
 
 	def get_specification(self):
 		return {
@@ -124,10 +130,13 @@ class BaseModel(ABC):
 			return False
 		try:
 			self._set_model(self.get_model_from_file(self.get_model_file()))
+		except MindException as ex:
+			self.set_errors(ex.get_errors())
 		except Exception as ex:
+			errors = list(ex.args).insert(0, self.__class__.__name__)
 			self.set_error(MindError(
 				MindError.CODE_MODEL_LOAD_FAIL,
-				list(ex.args).insert(0, self.__class__.__name__)
+				errors
 			))
 			return False
 		return True
@@ -188,14 +197,11 @@ class BaseModel(ABC):
 				))
 		elif type(predictions) is dict:
 			if output['name'] not in predictions:
-				self.set_error(
-					'after_prediction',
-					'{}: Can`t find output name [{}] in model prediction. Available only {}'.format(
-						self.__class__.__name__,
-						output['name'],
-						list(predictions.keys())
-					)
-				)
+				self.set_error(MindError(
+					MindError.CODE_MODEL_OUTPUT_NAME_NOT_FOUND,
+					'{}: Can`t find output name [{}] in model prediction. Available only {}',
+					[self.__class__.__name__, output['name'], list(predictions.keys())]
+				))
 			else:
 				return predictions[output_id]
 		return []
@@ -213,21 +219,39 @@ class BaseModel(ABC):
 				filter_class = getattr(importlib.import_module('ML.filters.'+filter_module), filter_class_name)
 				filter_object = filter_class(a_data=data, a_input_output_id=io_id, a_model=self, a_type=filter_type)
 			except Exception as ex:
-				self.set_error('filters_pipeline', 'filter name {} not found'.format(filter_name))
+				self.set_error(MindError(
+					MindError.CODE_FILTER_NOT_FOUND,
+					'filter name [{}] not found',
+					[filter_name]
+				))
 				return result
 
 			if not isinstance(filter_object, ML.filters.base_filter.BaseFilter):
-				self.set_error('filters_pipeline', '{} is not a regular filter'.format(filter_name))
+				self.set_error(MindError(
+					MindError.CODE_FILTER_WRONG_INTERFACE,
+					'[{}] is not a regular filter',
+					[filter_name]
+				))
 				return result
 
 			filter_method = getattr(filter_object, 'apply', None)
 			if callable(filter_method):
 				try:
 					result = filter_method()
+				except MindException as ex:
+					self.set_errors(ex.get_errors())
 				except Exception as ex:
-					self.set_error('filters_pipeline({})'.format(filter_name), ex.args)
+					self.set_error(MindError(
+						MindError.CODE_FILTER_RUNTIME_ERROR,
+						'{}: ' + ', '.join(ex.args),
+						[filter_name]
+					))
 			else:
-				self.set_error('filters_pipeline({})'.format(filter_name), 'apply method not found in filter')
+				self.set_error(MindError(
+					MindError.CODE_FILTER_WRONG_INTERFACE,
+					'apply method not found in filter [{}]',
+					[filter_name]
+				))
 		return result
 
 	def _describe_inputs(self):

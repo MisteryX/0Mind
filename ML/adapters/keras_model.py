@@ -6,7 +6,7 @@ __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
 __version__ = "1.0.0"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"
 
 try:
 	import keras
@@ -14,6 +14,7 @@ except ImportError as e:
 	pass
 
 from ML.adapters.base_model import BaseModel
+from components.mind_exception import *
 
 
 class KerasModel(BaseModel):
@@ -73,7 +74,11 @@ class KerasModel(BaseModel):
 		try:
 			predictions = self.get_model().predict(data)
 		except Exception as ex:
-			self.set_error('predict', ex.args)
+			self.set_error(MindError(
+				MindError.CODE_MODEL_PREDICT_RUNTIME_ERROR,
+				'{}: ' + ', '.join(ex.args),
+				[self.__class__.__name__]
+			))
 		return predictions
 
 	def _before_predict(self, data):

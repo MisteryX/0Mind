@@ -6,7 +6,7 @@ __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
 __version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"
 
 from ML.filters.base_filter import BaseFilter
 from components.mind_exception import *

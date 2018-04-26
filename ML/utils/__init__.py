@@ -6,4 +6,4 @@ __credits__ = ["Maxim Morskov"]
 __license__ = "Proprietary"
 __version__ = "0.7.1"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"

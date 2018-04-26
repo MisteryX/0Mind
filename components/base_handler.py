@@ -6,11 +6,12 @@ __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
 __version__ = "1.0.0"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"
 
 import tornado
 from tornado import web, escape, httpclient, gen
 import logging as log
+from components.mind_exception import *
 
 
 SLEEP_PERIOD_UNTIL_NEXT_TRY = 0.002
@@ -29,7 +30,14 @@ class BaseHandler(tornado.web.RequestHandler):
 		if self.request.body:
 			content_type = self.request.headers.get('content-type', '')
 			if content_type != 'application/json':
-				self._raise_error(400, '{}: Wrong header Content-Type: {}'.format(self.__class__.__name__, content_type))
+				self._raise_error(
+					400,
+					[MindError(
+						MindError.CODE_REQUEST_WRONG_CONTENT_TYPE,
+						'{}: Wrong header Content-Type: {}',
+						[self.__class__.__name__, content_type]
+					)]
+				)
 			self._data = tornado.escape.json_decode(self.request.body)
 			self._validate_data(self._data, self._json_attributes)
 
@@ -41,13 +49,18 @@ class BaseHandler(tornado.web.RequestHandler):
 			if attribute not in data:
 				self._raise_error(
 					400,
-					'{}: Wrong request! Missing compulsory {} attribute [{}]'.format(self.__class__.__name__, container_type, attribute)
+					[MindError(
+						MindError.CODE_REQUEST_ATTRIBUTES_VALIDATION,
+						'{}: Wrong request! Missing compulsory {} attribute [{}]',
+						[self.__class__.__name__, container_type, attribute]
+					)]
 				)
 
-	def _raise_error(self, http_code: int, message: str):
-		self._service.log().append(message, log.ERROR)
+	def _raise_error(self, http_code: int, errors: list):
+		for error in errors:
+			self._service.log().append(error.get_message().format(error.get_params()), log.ERROR)
 		self.set_status(http_code)
-		self.write({'error': message})
+		self.write({'errors': MindError.get_as_json_serializable(errors)})
 		self.finish()
 
 	'''

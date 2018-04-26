@@ -6,7 +6,7 @@ __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
 __version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
-__site__ = "http://0mind.net"
+__email__ = "0mind@inbox.ru"
 
 
 class MindError:
@@ -18,9 +18,19 @@ class MindError:
 	CODE_MODEL_FILE_IS_UNREACHABLE = 5
 	CODE_MODEL_LOAD_FAIL = 6
 	CODE_MODEL_OUTPUT_NOT_FOUND = 7
-	CODE_FILTER_WRONG_TYPE = 10
-	CODE_FILTER_WRONG_PARAMS = 11
-	CODE_FILTER_FILE_IS_UNREACHABLE = 12
+	CODE_MODEL_OUTPUT_NAME_NOT_FOUND = 8
+	CODE_MODEL_PREDICT_RUNTIME_ERROR = 9
+	CODE_FILTER_WRONG_TYPE = 50
+	CODE_FILTER_WRONG_PARAMS = 51
+	CODE_FILTER_FILE_IS_UNREACHABLE = 52
+	CODE_FILTER_NOT_FOUND = 53
+	CODE_FILTER_WRONG_INTERFACE = 54
+	CODE_FILTER_RUNTIME_ERROR = 55
+	CODE_REQUEST_ATTRIBUTES_VALIDATION = 100
+	CODE_REQUEST_WRONG_CONTENT_TYPE = 101
+	CODE_REQUEST_MODEL_LOAD_HAS_NO_DATA = 102
+	CODE_REQUEST_MODEL_HAS_BEEN_ALREADY_LOADED = 103
+	CODE_REQUEST_UNKNOWN_LOAD_MODEL_ERROR = 104
 
 	def __init__(self, code: int, message: str, params: list):
 		self.__code = code
@@ -43,6 +53,13 @@ class MindError:
 			'params': self.get_params()
 		}
 
+	@staticmethod
+	def get_as_json_serializable(errors: list):
+		result = []
+		for error in errors:
+			result.append(error.get_as_dict())
+		return result
+
 
 class MindException(RuntimeError):
 	__previous_errors = None
@@ -59,3 +76,8 @@ class MindException(RuntimeError):
 
 	def get_previous_errors(self)->list:
 		return self.__previous_errors
+
+	def get_errors(self)->list:
+		error_list = self.__previous_errors
+		error_list.append(self.__error)
+		return error_list
