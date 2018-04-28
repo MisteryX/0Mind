@@ -4,7 +4,7 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
@@ -18,27 +18,46 @@ class ModelPredictHandler(ModelHandler):
 	async def post(self):
 
 		if not self.get_data() or len(self.get_data()) == 0:
-			self._raise_error(400, '{}: Wrong request! Data is empty'.format(self.__class__.__name__))
+			self._raise_error(
+				400,
+				[MindError(
+					MindError.CODE_REQUEST_WRONG_DATA_IS_EMPTY,
+					'{}: Wrong request! Data is empty',
+					[self.__class__.__name__]
+				)]
+			)
 
 		model = self.get_service().get_model(self.get_model_id())
 
 		if model is None or not isinstance(model, BaseModel):
-			self._raise_error(413, 'No idle instances of model_id={}. Try again later.'.format(self.get_model_id()))
+			self._raise_error(
+				413,
+				[MindError(
+					MindError.CODE_REQUEST_NO_IDLE_MODELS_FOR_PREDICT,
+					'No idle instances of model_id={}. Try again later.',
+					[self.get_model_id()]
+				)]
+			)
 
 		result = {}
 		model_time = 0
-
 		model.clear_errors()
+
 		try:
 			profiler = Profiler()
 			result = await self.__get_predict(model, self.get_data())
 			model_time = profiler.get_timing()
+		except MindException as ex:
+			self._raise_error(500, ex.get_errors())
 		except Exception as ex:
-			self._raise_error(500, str(ex.args))
+			self._raise_error(500, [MindError(
+					MindError.CODE_REQUEST_UNKNOWN_PREDICT_ERROR,
+					'{}: ' + ', '.join(ex.args),
+					[self.__class__.__name__]
+				)])
 
 		if model.has_errors():
-			errors = model.get_errors()
-			self._raise_error(500, 'model_id={}: {}'.format(self.get_model_id(), errors))
+			self._raise_error(500, model.get_errors())
 
 		self.write({
 			'result': result,

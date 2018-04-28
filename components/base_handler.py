@@ -4,7 +4,7 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
@@ -58,7 +58,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 	def _raise_error(self, http_code: int, errors: list):
 		for error in errors:
-			self._service.log().append(error.get_message().format(error.get_params()), log.ERROR)
+			self._service.log().append(error.get_message().format(*error.get_params()), log.ERROR)
 		self.set_status(http_code)
 		self.write({'errors': MindError.get_as_json_serializable(errors)})
 		self.finish()

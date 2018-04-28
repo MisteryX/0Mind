@@ -31,6 +31,11 @@ class MindError:
 	CODE_REQUEST_MODEL_LOAD_HAS_NO_DATA = 102
 	CODE_REQUEST_MODEL_HAS_BEEN_ALREADY_LOADED = 103
 	CODE_REQUEST_UNKNOWN_LOAD_MODEL_ERROR = 104
+	CODE_REQUEST_WRONG_DATA_IS_EMPTY = 105
+	CODE_REQUEST_NO_IDLE_MODELS_FOR_PREDICT = 106
+	CODE_REQUEST_UNKNOWN_PREDICT_ERROR = 107
+	CODE_REQUEST_MODEL_NOT_FOUND = 108
+	CODE_REQUEST_WRONG_POOL_ID_FOR_STOP_COMMAND = 109
 
 	def __init__(self, code: int, message: str, params: list):
 		self.__code = code
@@ -49,7 +54,7 @@ class MindError:
 	def get_as_dict(self)->dict:
 		return {
 			'code': self.get_code(),
-			'message': self.get_message(),
+			'message': (self.get_message()).format(*self.get_params()),
 			'params': self.get_params()
 		}
 

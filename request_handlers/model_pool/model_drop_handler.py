@@ -4,7 +4,7 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
@@ -22,7 +22,7 @@ class ModelDropHandler(ModelHandler):
 
 		model_id = self.get_model_id()
 
-		self.get_service().log().append('{}: received request to drop the model id [{}]'.format(self.__class__.__name__, model_id))
+		self.get_service().log().append('{}: received request to drop the model with id [{}]'.format(self.__class__.__name__, model_id))
 		process = psutil.Process()
 		memory_overview_before = process.memory_info()
 		profiler = Profiler()

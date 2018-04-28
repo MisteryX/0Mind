@@ -120,8 +120,10 @@ class ModelPool(Service):
 		return result
 
 	def __drop_model(self, model_id)->bool:
-		del self.get_models()[model_id]
-		return True
+		if model_id in self.get_models():
+			del self.get_models()[model_id]
+			return True
+		return False
 
 	def __load_models(self, a_tasks=None)->int:
 		models_count = 0

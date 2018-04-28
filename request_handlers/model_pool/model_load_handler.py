@@ -14,6 +14,8 @@ import psutil
 
 
 class ModelLoadHandler(BaseHandler):
+	_attributes = None
+
 	def initialize(self, service):
 		super(ModelLoadHandler, self).initialize(service)
 		self._attributes = self.get_service().get_pool_task_attributes()

@@ -4,11 +4,12 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
 from components.base_handler import *
+from components.mind_exception import *
 
 
 class ModelHandler(BaseHandler):
@@ -21,11 +22,15 @@ class ModelHandler(BaseHandler):
 		if not self.get_service().is_model_exists(self.get_model_id()):
 			self._raise_error(
 				404,
-				'{}: model_id={} not found in pool_id={}'.format(
-					self.__class__.__name__,
-					self.get_model_id(),
-					self.get_service().get_id()
-				)
+				[MindError(
+					MindError.CODE_REQUEST_MODEL_NOT_FOUND,
+					'{}: model_id={} not found in pool_id={}',
+					[
+						self.__class__.__name__,
+						self.get_model_id(),
+						self.get_service().get_id()
+					]
+				)]
 			)
 		super().prepare()
 

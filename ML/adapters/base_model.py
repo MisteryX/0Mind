@@ -204,7 +204,7 @@ class BaseModel(ABC):
 				))
 			else:
 				return predictions[output_id]
-		return []
+		return predictions
 
 	def _describe_model_metadata(self):
 		self._set_description('tool', self.get_package_name())
