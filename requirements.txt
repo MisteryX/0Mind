@@ -1,4 +1,5 @@
 numpy
 keras
+sklearn
 tornado
 psutil
