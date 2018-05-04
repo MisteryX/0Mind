@@ -1,4 +1,4 @@
-# 0Mind project's documentation
+# 0Mind documentation
 
 Actual link to documentation can be found on official site *http://0mind.net*
 

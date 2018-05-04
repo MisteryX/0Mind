@@ -1,5 +1,5 @@
 numpy
 keras
-sklearn
+tensorflow
 tornado
 psutil

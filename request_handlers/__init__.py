@@ -9,8 +9,6 @@ __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
 __all__ = [
-    'base_handler',
     'core',
     'model_pool',
-    'brain'
 ]

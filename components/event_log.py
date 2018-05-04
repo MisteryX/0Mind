@@ -25,24 +25,18 @@ DEFAULT_CONFIG_FILE = 'configs/logger.json'
 
 class EventLog:
 	__config = None
-	__redis = None
 	__name = ""
 
-	def __init__(self, name, redis_config=None, logger_config=None):
+	def __init__(self, name, logger_config=None):
 		self.__name = name
 
 		if logger_config is None:
 			self.__config = json.loads(FileHelper.get_text_file_content(DEFAULT_CONFIG_FILE))
-			if redis_config is not None:
-				self.__config['redis_config'] = redis_config
 		else:
-			self.__config = {'logger_config': logger_config, 'redis_config': redis_config, 'name': name}
+			self.__config = {'logger_config': logger_config, 'name': name}
 
 		if 'handlers' in self.__config['logger_config'] and 'default' in self.__config['logger_config']['handlers']:
 			self.__config['logger_config']['handlers']['default']['filename'] = 'logs/' + self.get_name() + '.log'
-
-		if 'redis_config' in self.__config and self.__config['redis_config'] is not None:
-			self.__redis = redis.StrictRedis(**self.__config['redis_config'])
 
 		log.config.dictConfig(self.__config['logger_config'])
 

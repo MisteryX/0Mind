@@ -12,8 +12,11 @@ from ML.filters.base_filter import BaseFilter
 from components.mind_exception import *
 import numpy as np
 import os
-import skimage.io
-import skimage.transform
+try:
+	import skimage.io
+	import skimage.transform
+except ImportError as e:
+	pass
 
 
 class ImageFileCaffe2Filter(BaseFilter):
