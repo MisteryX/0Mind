@@ -13,13 +13,23 @@ try:
 except ImportError as e:
 	pass
 
-from ML.adapters.base_model import BaseModel
+import numpy as np
+from ML.adapters.base_incomplete_model import BaseIncompleteModel
 from components.mind_exception import *
+from helpers.serialization_helper import *
 
 
-class SKLearnModel(BaseModel):
-	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None):
-		super(SKLearnModel, self).__init__(model_file=model_file, model=model, input_filters=input_filters, output_filters=output_filters)
+class SKLearnModel(BaseIncompleteModel):
+	__model_file_content = None
+
+	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
+		super().__init__(
+			model_file=model_file,
+			model=model,
+			input_filters=input_filters,
+			output_filters=output_filters,
+			**params
+		)
 
 	@staticmethod
 	def get_package_name():
@@ -30,46 +40,20 @@ class SKLearnModel(BaseModel):
 		return False
 
 	def get_model_from_file(self, file_name: str):
-		pass
+		self.__model_file_content = SerializationHelper.get_model_content_from_file(
+			file_name,
+			SKLearnModel.get_package_name()
+		)
+		return SerializationHelper.get_sklearn_model_from_file(self.__model_file_content[SKLEARN_MODEL_FILE_NAME])
 
 	def _get_input_list(self)->list:
-		pass
-
-	@staticmethod
-	def _get_input_name(model_input)->str:
-		pass
-
-	@staticmethod
-	def _get_input_type(model_input)->str:
-		pass
-
-	@staticmethod
-	def _get_input_shape(model_input) -> list:
-		pass
-
-	def _get_output_list(self)->list:
-		pass
-
-	@staticmethod
-	def _get_output_name(model_output)->str:
-		pass
-
-	@staticmethod
-	def _get_output_type(model_output)->str:
-		pass
-
-	@staticmethod
-	def _get_output_shape(model_output) -> list:
-		pass
-
-	@staticmethod
-	def __get_shape_from_model(model_input_or_output)->list:
-		pass
+		model_spec = json.loads(self.__model_file_content[INPUT_SPEC_FILE_NAME].read())
+		return model_spec.get('inputs', [])
 
 	def _get_prediction(self, data):
-		pass
+		return self.get_model().predict(data)
 
-	def _before_predict(self, data):
-		result = super()._before_predict(data)
-		pass
-		return result
+	def _get_data_for_filter(self, data, filter_type='input'):
+		if filter_type == 'input':
+			return np.array(data)
+		return data

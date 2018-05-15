@@ -69,7 +69,7 @@ class ModelPool(Service):
 				if not is_task_valid:
 					raise MindException(
 						MindError(
-							MindError.CODE_TASK_VALIDATION,
+							ERROR_CODE_TASK_VALIDATION,
 							'Compulsory task attribute [{}] not found in the task {}',
 							[wrong_attribute, str(task)]
 						)
@@ -78,7 +78,7 @@ class ModelPool(Service):
 			if self.get_option('model_types') and task['model_type'] not in self.get_option('model_types'):
 				raise MindException(
 					MindError(
-						MindError.CODE_MODEL_UNSUPPORTED_TYPE,
+						ERROR_CODE_MODEL_UNSUPPORTED_TYPE,
 						'Task id [{}] has unsupported type [{}] so can`t be loaded',
 						[task['id'], task['model_type']]
 					)
@@ -89,22 +89,26 @@ class ModelPool(Service):
 			model = ModelFactory().get_model(**task)
 
 			if model.has_errors():
-				raise Exception(model.get_errors())
+				raise MindException(previous_errors=model.get_errors())
 			self.__append_model(task['id'], model)
 			self.model_list_check_sum_update()
 		except Exception as ex:
-			self.log().append(', '.join(ex.args), log.ERROR)
+			log_message = ', '.join(ex.args) if not isinstance(ex, MindException) else json.dumps(
+				MindError.get_as_json_serializable(ex.get_errors())
+			)
+			self.log().append(log_message, log.ERROR)
+
 			if raise_exception:
 				if not isinstance(ex, MindException):
 					raise MindException(
 						MindError(
-							MindError.CODE_UNKNOWN,
+							ERROR_CODE_UNKNOWN,
 							', '.join(ex.args),
 							list(ex.args)
 						)
 					)
 				else:
-					raise ex
+					raise
 			else:
 				return False
 		return True

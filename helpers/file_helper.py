@@ -38,15 +38,23 @@ class FileHelper:
 	@staticmethod
 	def get_compressed_tar_file_content(file_name: str, files_list: list, mode='r:gz')->dict:
 		result = {}
+		tar = tarfile.open(file_name, mode)
+		for compressed_file_name in files_list:
+			file_gz = tar.getmember(compressed_file_name)
+			uncompressed_file = tar.extractfile(file_gz)
+
+			if uncompressed_file is None:
+				raise Exception("Can`t extract file {} from {} archive".format(compressed_file_name, file_name))
+			result[compressed_file_name] = uncompressed_file
+		return result
+
+	@staticmethod
+	def write_files_to_tar(file_name: str, files_list: list, mode='w:gz'):
+		if not files_list:
+			return
 		with tarfile.open(file_name, mode) as tar:
 			for compressed_file_name in files_list:
-				file_gz = tar.getmember(compressed_file_name)
-				uncompressed_file = tar.extractfile(file_gz)
-
-				if uncompressed_file is None:
-					raise Exception("Can`t extract file {} from {} archive".format(compressed_file_name, file_name))
-				result[compressed_file_name] = uncompressed_file.read()
-		return result
+				tar.add(compressed_file_name)
 
 	@staticmethod
 	def get_text_file_lines(file_name, quiet=False):
@@ -64,6 +72,10 @@ class FileHelper:
 		result = _file.write(body)
 		_file.close()
 		return result
+
+	@staticmethod
+	def get_file_extension(file_name: str) -> str:
+		return file_name.split('.')[-1]
 
 
 # --== Entry point ==--

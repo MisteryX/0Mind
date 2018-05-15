@@ -23,7 +23,7 @@ class CommandStopHandler(BaseHandler):
 		if self._service.get_id() != pool_id:
 			self._raise_error(500, [
 				MindError(
-					MindError.CODE_REQUEST_WRONG_POOL_ID_FOR_STOP_COMMAND,
+					ERROR_CODE_REQUEST_WRONG_POOL_ID_FOR_STOP_COMMAND,
 					'Wrong pool_id={} for [stop] command',
 					[pool_id]
 				)

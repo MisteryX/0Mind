@@ -12,7 +12,8 @@ import importlib
 from importlib import util
 from abc import ABC, abstractmethod
 import ML
-from helpers.file_helper import *
+from helpers.file_helper import FileHelper
+from helpers.module_helper import ModuleHelper
 from ML.filters.o_default import DefaultFilter
 from components.mind_exception import *
 
@@ -26,9 +27,10 @@ class BaseModel(ABC):
 	__model = None
 	__input_filters = None
 	__output_filters = None
+	__params = None
 
 	@abstractmethod
-	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None):
+	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		self.__errors = []
 		self.__description = {}
 		self.__inputs = {}
@@ -36,6 +38,7 @@ class BaseModel(ABC):
 		self.__model_file = model_file
 		self.__input_filters = {} if input_filters is None else input_filters
 		self.__output_filters = {} if output_filters is None else output_filters
+		self.__params = params
 		if self.__model_file:
 			if not self._load_model_from_file():
 				return
@@ -112,7 +115,7 @@ class BaseModel(ABC):
 		for input_id, input_ in inputs.items():
 			if input_.get('name', '') not in data:
 				self.set_error(MindError(
-					MindError.CODE_MODEL_INPUT_NOT_FOUND_IN_DATA,
+					ERROR_CODE_MODEL_INPUT_NOT_FOUND_IN_DATA,
 					'Model input [{}] not found in the specified data',
 					[input_.get('name', '')]
 				))
@@ -123,7 +126,7 @@ class BaseModel(ABC):
 		is_file_reachable, error_message = FileHelper.is_file_reachable(self.get_model_file(), True)
 		if not is_file_reachable:
 			self.set_error(MindError(
-				MindError.CODE_MODEL_FILE_IS_UNREACHABLE,
+				ERROR_CODE_MODEL_FILE_IS_UNREACHABLE,
 				error_message,
 				[self.__class__.__name__]
 			))
@@ -133,13 +136,19 @@ class BaseModel(ABC):
 		except MindException as ex:
 			self.set_errors(ex.get_errors())
 		except Exception as ex:
-			errors = list(ex.args).insert(0, self.__class__.__name__)
+			errors = list(ex.args)
+			errors.insert(0, self.get_model_file())
+			errors.insert(0, self.__class__.__name__)
 			self.set_error(MindError(
-				MindError.CODE_MODEL_LOAD_FAIL,
+				ERROR_CODE_MODEL_LOAD_FAIL,
+				'{} Can`t load model from file [{}]',
 				errors
 			))
 			return False
 		return True
+
+	def _get_data_for_filter(self, data, filter_type='input'):
+		return data
 
 	def _before_predict(self, data):
 		result = data
@@ -151,7 +160,7 @@ class BaseModel(ABC):
 				result[input_['name']] = self._run_filters_pipeline(
 					input_filters[input_['name']],
 					input_id,
-					data[input_['name']],
+					self._get_data_for_filter(data[input_['name']], filter_type='input'),
 					filter_type='input'
 				)
 		return result
@@ -162,7 +171,10 @@ class BaseModel(ABC):
 		output_filters = self.get_output_filters()
 
 		for output_id, output_ in self.get_outputs().items():
-			__prediction = self.__get_prediction_from_model_output(predictions, output_id, output_['name'])
+			__prediction = self._get_data_for_filter(
+				self.__get_prediction_from_model_output(predictions, output_id, output_['name']),
+				filter_type='output'
+			)
 			if output_['name'] in output_filters and (predictions is not None and len(predictions) != 0):
 				__filter = output_filters[output_['name']]
 				result[output_['name']] = self._run_filters_pipeline(
@@ -191,14 +203,14 @@ class BaseModel(ABC):
 				return predictions[output_id]
 			else:
 				self.set_error(MindError(
-					MindError.CODE_MODEL_OUTPUT_NOT_FOUND,
+					ERROR_CODE_MODEL_OUTPUT_NOT_FOUND,
 					'{}: Can`t determine output id for model prediction',
 					[self.__class__.__name__]
 				))
 		elif type(predictions) is dict:
 			if output['name'] not in predictions:
 				self.set_error(MindError(
-					MindError.CODE_MODEL_OUTPUT_NAME_NOT_FOUND,
+					ERROR_CODE_MODEL_OUTPUT_NAME_NOT_FOUND,
 					'{}: Can`t find output name [{}] in model prediction. Available only {}',
 					[self.__class__.__name__, output['name'], list(predictions.keys())]
 				))
@@ -216,11 +228,11 @@ class BaseModel(ABC):
 		for filter_name in filters:
 			filter_module, filter_class_name = ML.filters.base_filter.BaseFilter.get_module_by_filter_id(filter_name)
 			try:
-				filter_class = getattr(importlib.import_module('ML.filters.'+filter_module), filter_class_name)
+				filter_class = ModuleHelper.get_class_for('ML.filters.'+filter_module, filter_class_name)
 				filter_object = filter_class(a_data=data, a_input_output_id=io_id, a_model=self, a_type=filter_type)
 			except Exception as ex:
 				self.set_error(MindError(
-					MindError.CODE_FILTER_NOT_FOUND,
+					ERROR_CODE_FILTER_NOT_FOUND,
 					'filter name [{}] not found',
 					[filter_name]
 				))
@@ -228,7 +240,7 @@ class BaseModel(ABC):
 
 			if not isinstance(filter_object, ML.filters.base_filter.BaseFilter):
 				self.set_error(MindError(
-					MindError.CODE_FILTER_WRONG_INTERFACE,
+					ERROR_CODE_FILTER_WRONG_INTERFACE,
 					'[{}] is not a regular filter',
 					[filter_name]
 				))
@@ -242,13 +254,13 @@ class BaseModel(ABC):
 					self.set_errors(ex.get_errors())
 				except Exception as ex:
 					self.set_error(MindError(
-						MindError.CODE_FILTER_RUNTIME_ERROR,
+						ERROR_CODE_FILTER_RUNTIME_ERROR,
 						'{}: ' + ', '.join(ex.args),
 						[filter_name]
 					))
 			else:
 				self.set_error(MindError(
-					MindError.CODE_FILTER_WRONG_INTERFACE,
+					ERROR_CODE_FILTER_WRONG_INTERFACE,
 					'apply method not found in filter [{}]',
 					[filter_name]
 				))

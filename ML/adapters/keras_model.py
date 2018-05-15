@@ -18,8 +18,14 @@ from components.mind_exception import *
 
 
 class KerasModel(BaseModel):
-	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None):
-		super(KerasModel, self).__init__(model_file=model_file, model=model, input_filters=input_filters, output_filters=output_filters)
+	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
+		super().__init__(
+			model_file=model_file,
+			model=model,
+			input_filters=input_filters,
+			output_filters=output_filters,
+			**params
+		)
 
 	@staticmethod
 	def get_package_name():
@@ -75,7 +81,7 @@ class KerasModel(BaseModel):
 			predictions = self.get_model().predict(data)
 		except Exception as ex:
 			self.set_error(MindError(
-				MindError.CODE_MODEL_PREDICT_RUNTIME_ERROR,
+				ERROR_CODE_MODEL_PREDICT_RUNTIME_ERROR,
 				'{}: ' + ', '.join(ex.args),
 				[self.__class__.__name__]
 			))

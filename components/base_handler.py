@@ -33,7 +33,7 @@ class BaseHandler(tornado.web.RequestHandler):
 				self._raise_error(
 					400,
 					[MindError(
-						MindError.CODE_REQUEST_WRONG_CONTENT_TYPE,
+						ERROR_CODE_REQUEST_WRONG_CONTENT_TYPE,
 						'{}: Wrong header Content-Type: {}',
 						[self.__class__.__name__, content_type]
 					)]
@@ -50,7 +50,7 @@ class BaseHandler(tornado.web.RequestHandler):
 				self._raise_error(
 					400,
 					[MindError(
-						MindError.CODE_REQUEST_ATTRIBUTES_VALIDATION,
+						ERROR_CODE_REQUEST_ATTRIBUTES_VALIDATION,
 						'{}: Wrong request! Missing compulsory {} attribute [{}]',
 						[self.__class__.__name__, container_type, attribute]
 					)]

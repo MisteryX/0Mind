@@ -20,7 +20,7 @@ class VectorPaddingToInputFilter(BaseFilter):
 		filtered_data = []
 		if self.get_type() != 'input':
 			self.get_model().set_error(MindError(
-				MindError.CODE_FILTER_WRONG_TYPE,
+				ERROR_CODE_FILTER_WRONG_TYPE,
 				'{}: can be used only as an input filter',
 				[self.__class__.__name__]
 			))

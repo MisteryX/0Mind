@@ -24,7 +24,7 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 		filtered_data = []
 		if self.get_type() != 'input':
 			self.get_model().set_error(MindError(
-				MindError.CODE_FILTER_WRONG_TYPE,
+				ERROR_CODE_FILTER_WRONG_TYPE,
 				'{}: can be used only as an input filter',
 				[self.__class__.__name__]
 			))
@@ -35,7 +35,7 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 					self.__get_images_norm_and_scaled(data_for_input['image_file']))
 			else:
 				self.get_model().set_error(MindError(
-					MindError.CODE_FILTER_WRONG_PARAMS,
+					ERROR_CODE_FILTER_WRONG_PARAMS,
 					'{}: missing param [{}]',
 					[self.__class__.__name__, 'image_file']
 				))
@@ -48,7 +48,7 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 		target_size = tuple(list(filter(lambda item: item != target_channels, input_shape)))
 		if not os.path.isfile(image_file_name) or not os.access(image_file_name, os.R_OK):
 			self.get_model().set_error(MindError(
-				MindError.CODE_FILTER_FILE_IS_UNREACHABLE,
+				ERROR_CODE_FILTER_FILE_IS_UNREACHABLE,
 				'{}: file [{}] is not accessible',
 				[self.__class__.__name__, image_file_name]
 			))

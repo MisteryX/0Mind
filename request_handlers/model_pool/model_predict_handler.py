@@ -21,7 +21,7 @@ class ModelPredictHandler(ModelHandler):
 			self._raise_error(
 				400,
 				[MindError(
-					MindError.CODE_REQUEST_WRONG_DATA_IS_EMPTY,
+					ERROR_CODE_REQUEST_WRONG_DATA_IS_EMPTY,
 					'{}: Wrong request! Data is empty',
 					[self.__class__.__name__]
 				)]
@@ -33,7 +33,7 @@ class ModelPredictHandler(ModelHandler):
 			self._raise_error(
 				413,
 				[MindError(
-					MindError.CODE_REQUEST_NO_IDLE_MODELS_FOR_PREDICT,
+					ERROR_CODE_REQUEST_NO_IDLE_MODELS_FOR_PREDICT,
 					'No idle instances of model_id={}. Try again later.',
 					[self.get_model_id()]
 				)]
@@ -51,7 +51,7 @@ class ModelPredictHandler(ModelHandler):
 			self._raise_error(500, ex.get_errors())
 		except Exception as ex:
 			self._raise_error(500, [MindError(
-					MindError.CODE_REQUEST_UNKNOWN_PREDICT_ERROR,
+					ERROR_CODE_REQUEST_UNKNOWN_PREDICT_ERROR,
 					'{}: ' + ', '.join(ex.args),
 					[self.__class__.__name__]
 				)])

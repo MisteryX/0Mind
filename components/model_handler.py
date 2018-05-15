@@ -23,7 +23,7 @@ class ModelHandler(BaseHandler):
 			self._raise_error(
 				404,
 				[MindError(
-					MindError.CODE_REQUEST_MODEL_NOT_FOUND,
+					ERROR_CODE_REQUEST_MODEL_NOT_FOUND,
 					'{}: model_id={} not found in pool_id={}',
 					[
 						self.__class__.__name__,

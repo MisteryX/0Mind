@@ -29,7 +29,7 @@ class ModelLoadHandler(BaseHandler):
 			self._raise_error(
 				500,
 				[MindError(
-					MindError.CODE_REQUEST_MODEL_LOAD_HAS_NO_DATA,
+					ERROR_CODE_REQUEST_MODEL_LOAD_HAS_NO_DATA,
 					'{}: No data is specified to load a model',
 					[self.__class__.__name__]
 				)]
@@ -39,7 +39,7 @@ class ModelLoadHandler(BaseHandler):
 			self._raise_error(
 				500,
 				[MindError(
-					MindError.CODE_REQUEST_MODEL_HAS_BEEN_ALREADY_LOADED,
+					ERROR_CODE_REQUEST_MODEL_HAS_BEEN_ALREADY_LOADED,
 					'{}: Model id [{}] has been already loaded in this pool',
 					[self.__class__.__name__, model_id]
 				)]
@@ -62,7 +62,7 @@ class ModelLoadHandler(BaseHandler):
 			self._raise_error(
 				500,
 				[MindError(
-					MindError.CODE_REQUEST_UNKNOWN_LOAD_MODEL_ERROR,
+					ERROR_CODE_REQUEST_UNKNOWN_LOAD_MODEL_ERROR,
 					'{}: ' + ', '.join(ex.args),
 					[self.__class__.__name__]
 				)]
