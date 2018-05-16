@@ -20,7 +20,6 @@ from ML.adapters.base_incomplete_model import BaseIncompleteModel
 
 
 class Caffe2Model(BaseIncompleteModel):
-	__model_file_content = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		super().__init__(
@@ -40,13 +39,13 @@ class Caffe2Model(BaseIncompleteModel):
 		return False
 
 	def get_model_from_file(self, file_name: str):
-		self.__model_file_content = SerializationHelper.get_model_content_from_file(
+		self._model_file_content = SerializationHelper.get_model_content_from_file(
 			file_name,
 			Caffe2Model.get_package_name()
 		)
 		return workspace.Predictor(
-			self.__model_file_content[CAFFE2_MODEL_INIT_FILE_NAME].read(),
-			self.__model_file_content[CAFFE2_MODEL_PREDICT_FILE_NAME].read()
+			self._model_file_content[CAFFE2_MODEL_INIT_FILE_NAME].read(),
+			self._model_file_content[CAFFE2_MODEL_PREDICT_FILE_NAME].read()
 		)
 
 	def _get_prediction(self, data):

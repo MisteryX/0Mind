@@ -15,12 +15,10 @@ except ImportError as e:
 
 import numpy as np
 from ML.adapters.base_incomplete_model import BaseIncompleteModel
-from components.mind_exception import *
 from helpers.serialization_helper import *
 
 
 class SKLearnModel(BaseIncompleteModel):
-	__model_file_content = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		super().__init__(
@@ -40,15 +38,19 @@ class SKLearnModel(BaseIncompleteModel):
 		return False
 
 	def get_model_from_file(self, file_name: str):
-		self.__model_file_content = SerializationHelper.get_model_content_from_file(
+		self._model_file_content = SerializationHelper.get_model_content_from_file(
 			file_name,
 			SKLearnModel.get_package_name()
 		)
-		return SerializationHelper.get_sklearn_model_from_file(self.__model_file_content[SKLEARN_MODEL_FILE_NAME])
+		return SerializationHelper.get_sklearn_model_from_file(self._model_file_content[SKLEARN_MODEL_FILE_NAME])
 
-	def _get_input_list(self)->list:
-		model_spec = json.loads(self.__model_file_content[INPUT_SPEC_FILE_NAME].read())
-		return model_spec.get('inputs', [])
+	def _before_predict(self, data):
+		result = super()._before_predict(data)
+		if len(result):
+			if len(self.get_inputs()) == 1:
+				return list(result.values())[0]
+			return list(result.values())
+		return result
 
 	def _get_prediction(self, data):
 		return self.get_model().predict(data)

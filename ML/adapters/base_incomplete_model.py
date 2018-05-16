@@ -8,6 +8,7 @@ __version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
+from components.mind_exception import *
 from ML.adapters.base_model import BaseModel
 from helpers.serialization_helper import *
 from abc import ABC, abstractmethod
@@ -15,7 +16,7 @@ import json
 
 
 class BaseIncompleteModel(BaseModel):
-	__model_file_content = None
+	_model_file_content = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		super().__init__(
@@ -26,9 +27,31 @@ class BaseIncompleteModel(BaseModel):
 			**params
 		)
 
+	def _get_io_list(self, io_spec_file_name: str, spec_type: str, error_code: int)->list:
+		try:
+			spec_json = ''
+			if hasattr(self._model_file_content[io_spec_file_name], 'read'):
+				spec_json = self._model_file_content[io_spec_file_name].read()
+			model_spec = json.loads(spec_json)
+		except Exception as ex:
+			params = list(ex.args)
+			params.insert(0, io_spec_file_name)
+			params.insert(0, self.__class__.__name__)
+			raise MindException(
+				MindError(
+					error_code,
+					'{}: [{}] can not be loaded - {}',
+					params
+				)
+			)
+		return model_spec.get(spec_type, [])
+
 	def _get_input_list(self)->list:
-		model_spec = json.loads(self.__model_file_content[INPUT_SPEC_FILE_NAME].read())
-		return model_spec.get('inputs', [])
+		return self._get_io_list(
+			INPUT_SPEC_FILE_NAME,
+			'inputs',
+			ERROR_CODE_MODEL_INPUT_SPEC_CAN_NOT_BE_LOADED
+		)
 
 	@staticmethod
 	def _get_input_name(model_input)->str:
@@ -43,8 +66,11 @@ class BaseIncompleteModel(BaseModel):
 		return model_input.get('shape', [])
 
 	def _get_output_list(self)->list:
-		model_spec = json.loads(self.__model_file_content[OUTPUT_SPEC_FILE_NAME].read())
-		return model_spec.get('outputs', [])
+		return self._get_io_list(
+			OUTPUT_SPEC_FILE_NAME,
+			'outputs',
+			ERROR_CODE_MODEL_OUTPUT_SPEC_CAN_NOT_BE_LOADED
+		)
 
 	@staticmethod
 	def _get_output_name(model_output)->str:

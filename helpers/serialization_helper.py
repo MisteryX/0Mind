@@ -8,7 +8,11 @@ __version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
-import joblib
+try:
+	from sklearn.externals import joblib
+except ImportError:
+	pass
+
 import json
 import os
 from helpers.file_helper import FileHelper
@@ -42,10 +46,6 @@ class SerializationHelper:
 		return joblib.load(model_file_content)
 
 	@staticmethod
-	def get_list_of_model_file_content(model_type: str)->list:
-		return SerializationHelper.__model_file_content_map.get(model_type, [])
-
-	@staticmethod
 	def build_sklearn_model_file(model, file_name, inputs_spec: dict, output_spec: dict):
 		joblib.dump(model, SKLEARN_MODEL_FILE_NAME)
 		FileHelper.write_to_file(INPUT_SPEC_FILE_NAME, json.dumps(inputs_spec))
@@ -57,6 +57,10 @@ class SerializationHelper:
 		os.remove(SKLEARN_MODEL_FILE_NAME)
 		os.remove(INPUT_SPEC_FILE_NAME)
 		os.remove(OUTPUT_SPEC_FILE_NAME)
+
+	@staticmethod
+	def get_list_of_model_file_content(model_type: str) -> list:
+		return SerializationHelper.__model_file_content_map.get(model_type, [])
 
 	@staticmethod
 	def get_model_content_from_file(file_name: str, model_type: str):

@@ -10,7 +10,6 @@ __email__ = "0mind@inbox.ru"
 
 import sys
 import os
-import os.path
 import tarfile
 
 
