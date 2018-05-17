@@ -2,9 +2,9 @@
 
 ## Frameworks
 
-Supported ML frameworks: keras, caffe2.
+**Keras, caffe2, scikit-learn** ML frameworks are supported by 0Mind now.
 
-You can easly add support for any ML framework, that has Python bindings,
+You can easly add support of any ML framework, that has Python 3 bindings,
 using [adapters mechanism](ADAPTERS.MD).
 
 ## Model's serialization
@@ -12,10 +12,10 @@ Use your framework's functionality for serialization of the model into one file.
 Optionaly you can use framework name as serialized file's extension for
 simplification of 0Mind configuration and model recognition in a file system.
 
-If target ML framework does not have tools for model's serialization into
+If target ML framework have no tools for model serialization into
 single file or it has no functionality for description of model's interface, required
 by 0Mind, you should do that using [framework adapters](ADAPTERS.MD) and additional structures in
-serialized model files. For example...
+serialized model files by using **helpers.serialization_helper.SerializationHelper.save_model() method**. Or you can do it manualy. For example...
 
 ### Caffe2
 It serializes ML model into files: **init_net.pb**, **predict_net.pb**
@@ -61,3 +61,5 @@ output_spec.json
 ```
 Optionaly you can change result file's extension to **caffe2**.
 Now your model is ready for 0Mind.
+
+### Scikit-learn

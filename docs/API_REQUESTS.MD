@@ -133,7 +133,7 @@ curl -d '{"data": [{"image_file": "samples/flower.jpg"}]}' -H "Content-Type:appl
 ```
 We got prediction from model with id=1, input name "data" and output name "default". This model has input filter "data": \["i_img_file_to_caffe2.ImageFileCaffe2Filter"\],
 so we specify batch data as {"image_file": "samples/flower.jpg"} for using filter, that transforms picture on disk to normalized and scaled tensor.
-Result of the model inference is the dictionary with model's outputs names as keys and values formatted according to model's output or output filter interface.
+Result of the model inference is the dictionary with model output names as keys and values formatted according to model's output or output filter interface.
 This model has output filter "default": \["io_argmax.ArgMaxFilter"\], so we got filter output - image class identifier.
 
 ## COMMAND-STOP

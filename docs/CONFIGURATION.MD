@@ -1,3 +1,4 @@
+# Configuration
 All 0Mind configuration can be described in 2 json files:
 ```
 configs/logger.json
