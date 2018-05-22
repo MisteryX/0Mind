@@ -10,10 +10,16 @@ git clone git@github.com:MisteryX/0Mind.git 0Mind
 ```
 Now you have all files of the project in the directory **0Mind**. 
 After that you should install all required Python packages.
-```
+```bash
 cd 0Mind
 pip3 install -r requirements.txt
 ```
+or if you use Conda
+```bash
+conda install --yes --file requirements.txt
+```
 
-## Special cases
-If you want to work with **caffe2** framework, you should install it manually using Conda\Miniconda and after that execute **pip install -r requirements.txt** in the Conda environment.
+## Frameworks
+0Mind supports [lots of ML frameworks](ML_FRAMEWORKS.MD), but in production environment usually used one or two,
+so we don't include all supported frameworks to requirements file. 
+To activate support of particular framework in 0Mind, you should install and configure required tool manually.

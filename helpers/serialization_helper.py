@@ -44,6 +44,10 @@ class SerializationHelper:
 			OUTPUT_SPEC_FILE_NAME,
 			CAFFE2_MODEL_INIT_FILE_NAME,
 			CAFFE2_MODEL_PREDICT_FILE_NAME
+		],
+		'trt': [
+			INPUT_SPEC_FILE_NAME,
+			OUTPUT_SPEC_FILE_NAME,
 		]
 	}
 
