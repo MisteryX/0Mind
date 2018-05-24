@@ -40,7 +40,8 @@ class SKLearnModel(BaseIncompleteModel):
 	def get_model_from_file(self, file_name: str):
 		self._model_file_content = SerializationHelper.get_model_content_from_file(
 			file_name,
-			self.get_package_name()
+			self.get_package_name(),
+			self.get_params()
 		)
 		return SerializationHelper.get_sklearn_model_from_file(self._model_file_content[SKLEARN_MODEL_FILE_NAME])
 

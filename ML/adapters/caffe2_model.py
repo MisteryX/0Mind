@@ -41,7 +41,8 @@ class Caffe2Model(BaseIncompleteModel):
 	def get_model_from_file(self, file_name: str):
 		self._model_file_content = SerializationHelper.get_model_content_from_file(
 			file_name,
-			Caffe2Model.get_package_name()
+			Caffe2Model.get_package_name(),
+			self.get_params()
 		)
 		return workspace.Predictor(
 			self._model_file_content[CAFFE2_MODEL_INIT_FILE_NAME].read(),

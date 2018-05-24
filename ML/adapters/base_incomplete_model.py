@@ -17,8 +17,10 @@ import json
 
 class BaseIncompleteModel(BaseModel):
 	_model_file_content = None
+	_params = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
+		self._params = params
 		super().__init__(
 			model_file=model_file,
 			model=model,
@@ -26,8 +28,14 @@ class BaseIncompleteModel(BaseModel):
 			output_filters=output_filters,
 			**params
 		)
+		self.__close_model_files()
 
-	def _get_io_list(self, io_spec_file_name: str, spec_type: str, error_code: int)->list:
+	def __close_model_files(self):
+		model_file_content = list(self._model_file_content.values())
+		if model_file_content:
+			model_file_content[0].close()
+
+	def _get_io_list_from_file(self, io_spec_file_name: str, spec_type: str, error_code: int)->list:
 		try:
 			spec_json = ''
 			if hasattr(self._model_file_content[io_spec_file_name], 'read'):
@@ -47,7 +55,9 @@ class BaseIncompleteModel(BaseModel):
 		return model_spec.get(spec_type, [])
 
 	def _get_input_list(self)->list:
-		return self._get_io_list(
+		if 'inputs' in self._params:
+			return self._params['inputs']
+		return self._get_io_list_from_file(
 			INPUT_SPEC_FILE_NAME,
 			'inputs',
 			ERROR_CODE_MODEL_INPUT_SPEC_CAN_NOT_BE_LOADED
@@ -66,7 +76,9 @@ class BaseIncompleteModel(BaseModel):
 		return model_input.get('shape', [])
 
 	def _get_output_list(self)->list:
-		return self._get_io_list(
+		if 'outputs' in self._params:
+			return self._params['outputs']
+		return self._get_io_list_from_file(
 			OUTPUT_SPEC_FILE_NAME,
 			'outputs',
 			ERROR_CODE_MODEL_OUTPUT_SPEC_CAN_NOT_BE_LOADED
@@ -101,3 +113,6 @@ class BaseIncompleteModel(BaseModel):
 	@abstractmethod
 	def is_model_async():
 		raise NotImplementedError('you must to override this!')
+
+	def get_params(self):
+		return self._params

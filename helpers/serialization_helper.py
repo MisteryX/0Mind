@@ -29,6 +29,7 @@ OUTPUT_SPEC_FILE_NAME = 'output_spec.json'
 CAFFE2_MODEL_INIT_FILE_NAME = 'init_net.pb'
 CAFFE2_MODEL_PREDICT_FILE_NAME = 'predict_net.pb'
 SKLEARN_MODEL_FILE_NAME = 'model.jbl'
+TRT_MODEL_FILE_NAME = 'model.trt'
 
 
 class SerializationHelper:
@@ -45,7 +46,7 @@ class SerializationHelper:
 			CAFFE2_MODEL_INIT_FILE_NAME,
 			CAFFE2_MODEL_PREDICT_FILE_NAME
 		],
-		'trt': [
+		'tensorrt': [
 			INPUT_SPEC_FILE_NAME,
 			OUTPUT_SPEC_FILE_NAME,
 		]
@@ -113,12 +114,19 @@ class SerializationHelper:
 		os.remove(OUTPUT_SPEC_FILE_NAME)
 
 	@staticmethod
-	def get_list_of_model_file_content(model_type: str) -> list:
-		return SerializationHelper.__model_file_content_map.get(model_type, [])
+	def get_list_of_model_file_content(model_type: str, params={}) -> list:
+		result = SerializationHelper.__model_file_content_map.get(model_type, [])
+		if params and 'inputs' in params:
+			result.remove(INPUT_SPEC_FILE_NAME)
+		if params and 'outputs' in params:
+			result.remove(OUTPUT_SPEC_FILE_NAME)
+		return result
 
 	@staticmethod
-	def get_model_content_from_file(file_name: str, model_type: str):
+	def get_model_content_from_file(file_name: str, model_type: str, params={}):
+		if 'inputs' in params and 'outputs' in params:
+			return {TRT_MODEL_FILE_NAME: open(file_name, 'r')}
 		return FileHelper.get_compressed_tar_file_content(
 			file_name,
-			SerializationHelper.get_list_of_model_file_content(model_type)
+			SerializationHelper.get_list_of_model_file_content(model_type, params)
 		)

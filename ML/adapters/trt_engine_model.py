@@ -15,6 +15,7 @@ except ImportError as e:
 
 from ML.adapters.base_incomplete_model import BaseIncompleteModel
 from helpers.serialization_helper import *
+from components.mind_exception import *
 
 
 class TRTEngineModel(BaseIncompleteModel):
@@ -30,13 +31,19 @@ class TRTEngineModel(BaseIncompleteModel):
 			**params
 		)
 
-	@staticmethod
-	def get_target_fw_from_model_file_name():
-		pass
+	def get_target_fw_from_model_file_name(self, file_name: str):
+		file_name_parts = file_name.split('.')
+		if len(file_name_parts) < 3:
+			raise MindException(MindError(
+				ERROR_CODE_MODEL_WRONG_FILE_NAME_FORMAT,
+				'[{}]: wrong file name format for [{}] engine',
+				[file_name, self.get_package_name()]
+			))
+		return file_name_parts[-2]
 
 	@staticmethod
 	def get_package_name():
-		return 'trt'
+		return 'tensorrt'
 
 	@staticmethod
 	def is_model_async():
