@@ -62,26 +62,6 @@ class Service(ABC):
 		raise NotImplementedError('you must to override this!')
 
 	@staticmethod
-	def _is_dictionary_valid(dictionary: dict, attributes: list):
-		for _attribute in attributes:
-			if _attribute not in dictionary:
-				return False, _attribute
-		return True, None
-
-	@staticmethod
-	def _get_copy_of_dictionary_with_keys(dictionary: dict, keys: list) -> dict:
-		return {key: dictionary[key] for key in keys if key in dictionary}
-
-	@staticmethod
-	def _get_list_of_values_from_list_of_dict(list_of_dict: list, key: str) -> list:
-		result = []
-		for dictionary in list_of_dict:
-			value = dictionary.get(key)
-			if value is not None:
-				result.append(value)
-		return result
-
-	@staticmethod
 	def _get_service_cpu_usage_url(service: dict):
 		return 'http://{}:{}/info/system'.format(
 			service.get('host'),

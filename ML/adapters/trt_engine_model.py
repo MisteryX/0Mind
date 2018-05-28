@@ -10,11 +10,12 @@ __email__ = "0mind@inbox.ru"
 
 try:
 	import tensorrt.lite
+	import uff
 except ImportError as e:
 	pass
 
 from ML.adapters.base_incomplete_model import BaseIncompleteModel
-from helpers.serialization_helper import *
+from helpers.validation_helper import *
 from components.mind_exception import *
 
 
@@ -31,15 +32,24 @@ class TRTEngineModel(BaseIncompleteModel):
 			**params
 		)
 
-	def get_target_fw_from_model_file_name(self, file_name: str):
-		file_name_parts = file_name.split('.')
-		if len(file_name_parts) < 3:
-			raise MindException(MindError(
-				ERROR_CODE_MODEL_WRONG_FILE_NAME_FORMAT,
-				'[{}]: wrong file name format for [{}] engine',
-				[file_name, self.get_package_name()]
-			))
-		return file_name_parts[-2]
+	@staticmethod
+	def __get_engine_attributes_map()->dict:
+		return {
+			'tf': ['framework', 'path', 'input_nodes', 'output_nodes'],
+			'uff': ['framework', 'path', 'input_nodes', 'output_nodes'],
+			'caffe': ['framework', 'deployfile', 'modelfile', 'input_nodes', 'output_nodes'],
+			'PLAN': ['PLAN']
+		}
+
+	def __get_input_nodes(self):
+		pass
+
+	def __get_output_nodes(self):
+		pass
+
+	@staticmethod
+	def __get_engine_attribues(engine_name: str)->list:
+		return TRTEngineModel.__get_engine_attributes_map().get(engine_name, [])
 
 	@staticmethod
 	def get_package_name():
@@ -50,11 +60,19 @@ class TRTEngineModel(BaseIncompleteModel):
 		return True
 
 	def get_model_from_file(self, file_name: str):
-		self._model_file_content = SerializationHelper.get_model_content_from_file(
-			file_name,
-			self.get_package_name()
-		)
-		return SerializationHelper.get_sklearn_model_from_file(self._model_file_content[SKLEARN_MODEL_FILE_NAME])
+		engine_params = self.get_params()
+		if 'PLAN' not in engine_params and 'framework' not in engine_params:
+			raise MindException(MindError(
+				ERROR_CODE_MODEL_TRT_MISSING_COMPULSORY_ENGINE_PARAM,
+				'[{}]: missing engine attribute [{}]',
+				[self.__class__.__name__, 'PLAN/framework']
+			))
+		if 'PLAN' in engine_params:
+			engine_params['PLAN'] = file_name
+		elif 'framework' in engine_params:
+			if 'caffe' == engine_params['framework']:
+				pass
+		return tensorrt.lite.Engine(**engine_params)
 
 	def _get_prediction(self, data):
 		return self.get_model().predict(data)

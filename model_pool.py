@@ -14,6 +14,7 @@ import json
 from helpers.file_helper import *
 from tornado import web
 from ML.model_factory import ModelFactory
+from helpers.validation_helper import *
 from components.service import Service
 from components.mind_exception import *
 from request_handlers.core.main_handler import *
@@ -65,7 +66,7 @@ class ModelPool(Service):
 	def load_model(self, task: dict, validate=True, raise_exception=False)->bool:
 		try:
 			if validate:
-				is_task_valid, wrong_attribute = self._is_dictionary_valid(task, self.get_pool_task_attributes())
+				is_task_valid, wrong_attribute = ValidationHelper.is_dictionary_valid(task, self.get_pool_task_attributes())
 				if not is_task_valid:
 					raise MindException(
 						MindError(
