@@ -21,7 +21,7 @@ from components.mind_exception import *
 
 class TRTEngineModel(BaseIncompleteModel):
 
-	__target_framework = ''
+	__target_framework = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		super().__init__(
@@ -41,14 +41,23 @@ class TRTEngineModel(BaseIncompleteModel):
 			'PLAN': ['PLAN']
 		}
 
-	def __get_input_nodes(self):
-		pass
+	def _set_target_framework(self, name: str):
+		self.__target_framework = name
 
-	def __get_output_nodes(self):
-		pass
+	def get_target_framework(self)->str:
+		return self.__target_framework
+
+	def __get_input_nodes(self)->dict:
+		result = {}
+		for input_ in self._get_input_list():
+			result[input_['name']] = tuple(input_['shape'])
+		return result
+
+	def __get_output_nodes(self)->list:
+		return ValidationHelper.get_list_of_values_from_list_of_dict(self._get_input_list(), 'name')
 
 	@staticmethod
-	def __get_engine_attribues(engine_name: str)->list:
+	def __get_engine_attributes(engine_name: str)->list:
 		return TRTEngineModel.__get_engine_attributes_map().get(engine_name, [])
 
 	@staticmethod
@@ -61,18 +70,30 @@ class TRTEngineModel(BaseIncompleteModel):
 
 	def get_model_from_file(self, file_name: str):
 		engine_params = self.get_params()
-		if 'PLAN' not in engine_params and 'framework' not in engine_params:
+		if 'PLAN' in engine_params:
+			self._set_target_framework('PLAN')
+			engine_params['PLAN'] = file_name
+		elif 'framework' in engine_params:
+			self._set_target_framework(engine_params['framework'])
+			engine_params['input_nodes'] = self.__get_input_nodes()
+			engine_params['output_nodes'] = self.__get_output_nodes()
+			if 'caffe' == engine_params['framework']:
+				engine_params['modelfile'] = file_name
+				if 'deployfile' not in engine_params:
+					raise MindException(MindError(
+						ERROR_CODE_MODEL_TRT_MISSING_ENGINE_ATTRIBUTE,
+						'[{}]: missing engine attribute [{}]',
+						[self.__class__.__name__, 'deployfile']
+					))
+			else:
+				engine_params['path'] = file_name
+		else:
 			raise MindException(MindError(
-				ERROR_CODE_MODEL_TRT_MISSING_COMPULSORY_ENGINE_PARAM,
+				ERROR_CODE_MODEL_TRT_MISSING_ENGINE_ATTRIBUTE,
 				'[{}]: missing engine attribute [{}]',
 				[self.__class__.__name__, 'PLAN/framework']
 			))
-		if 'PLAN' in engine_params:
-			engine_params['PLAN'] = file_name
-		elif 'framework' in engine_params:
-			if 'caffe' == engine_params['framework']:
-				pass
 		return tensorrt.lite.Engine(**engine_params)
 
 	def _get_prediction(self, data):
-		return self.get_model().predict(data)
+		return self.get_model().infer(data)

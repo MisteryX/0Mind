@@ -2,7 +2,9 @@
 
 ## Frameworks
 
-**Keras, caffe2, scikit-learn** ML frameworks are supported by 0Mind now.
+**Keras, Caffe2, Scikit-learn, TensorRT** ML frameworks are fully supported by 0Mind server now.
+
+**TensorRT** can be used only with NVIDIA GPU's with serialized models from engines **caffe, tensorflow, uff, PLAN**
 
 You can easly add support of any ML framework, that has Python 3 bindings,
 using [adapters mechanism](ADAPTERS.MD).
@@ -60,6 +62,23 @@ input_spec.json
 output_spec.json
 ```
 Optionaly you can change result file's extension to **caffe2**.
-Now your model is ready for 0Mind.
+Now your model is ready for 0Mind. 
+Alternatively you can use **helpers.serialization_helper.SerializationHelper.save_model()** for model preparing.
 
 ### Scikit-learn
+You should use **SerializationHelper** to save model into file. For example:
+```
+from helpers.serialization_helper import SerializationHelper
+...
+model.fit(features, results)
+...
+SerializationHelper.save_model(
+    'sklearn',
+    model,
+    serialized_file_name,
+    {'inputs': [{'name': 'main', 'type': 'float32', 'shape': [1, 28]}]},
+    {'outputs': [{'name': 'default', 'type': 'float32', 'shape': [1, 1]}]}
+)
+```
+
+### TensorRT

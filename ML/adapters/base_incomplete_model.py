@@ -9,6 +9,7 @@ __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
 from components.mind_exception import *
+from helpers.validation_helper import *
 from ML.adapters.base_model import BaseModel
 from helpers.serialization_helper import *
 from abc import ABC, abstractmethod
@@ -56,12 +57,22 @@ class BaseIncompleteModel(BaseModel):
 
 	def _get_input_list(self)->list:
 		if 'inputs' in self._params:
-			return self._params['inputs']
-		return self._get_io_list_from_file(
-			INPUT_SPEC_FILE_NAME,
-			'inputs',
-			ERROR_CODE_MODEL_INPUT_SPEC_CAN_NOT_BE_LOADED
-		)
+			inputs = self._params['inputs']
+		else:
+			inputs = self._get_io_list_from_file(
+				INPUT_SPEC_FILE_NAME,
+				'inputs',
+				ERROR_CODE_MODEL_INPUT_SPEC_CAN_NOT_BE_LOADED
+			)
+		for input_ in inputs:
+			is_valid, attribute = ValidationHelper.is_dictionary_valid(input_, self.get_io_attributes())
+			if not is_valid:
+				raise MindException(MindError(
+					ERROR_CODE_MODEL_MISSING_IO_ATTRIBUTE,
+					'[{}]: missing input attribute [{}]',
+					[self.__class__.__name__, attribute]
+				))
+		return inputs
 
 	@staticmethod
 	def _get_input_name(model_input)->str:
@@ -77,12 +88,22 @@ class BaseIncompleteModel(BaseModel):
 
 	def _get_output_list(self)->list:
 		if 'outputs' in self._params:
-			return self._params['outputs']
-		return self._get_io_list_from_file(
-			OUTPUT_SPEC_FILE_NAME,
-			'outputs',
-			ERROR_CODE_MODEL_OUTPUT_SPEC_CAN_NOT_BE_LOADED
-		)
+			outputs = self._params['outputs']
+		else:
+			outputs = self._get_io_list_from_file(
+				OUTPUT_SPEC_FILE_NAME,
+				'outputs',
+				ERROR_CODE_MODEL_OUTPUT_SPEC_CAN_NOT_BE_LOADED
+			)
+		for output_ in outputs:
+			is_valid, attribute = ValidationHelper.is_dictionary_valid(output_, self.get_io_attributes())
+			if not is_valid:
+				raise MindException(MindError(
+					ERROR_CODE_MODEL_MISSING_IO_ATTRIBUTE,
+					'[{}]: missing output attribute [{}]',
+					[self.__class__.__name__, attribute]
+				))
+		return outputs
 
 	@staticmethod
 	def _get_output_name(model_output)->str:

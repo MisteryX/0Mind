@@ -282,6 +282,10 @@ class BaseModel(ABC):
 				'shape': self._get_output_shape(model_output)
 			})
 
+	@staticmethod
+	def get_io_attributes()->list:
+		return ['name', 'type', 'shape']
+
 	@abstractmethod
 	def _get_prediction(self, data):
 		raise NotImplementedError('you must to override this!')
