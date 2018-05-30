@@ -19,7 +19,7 @@ class CommandStopHandler(BaseHandler):
 	async def post(self, *args, **kwargs):
 		self._service.log().append('Received command [stop]')
 
-		pool_id = int(self._data.get('pool_id', None)) if self._data else None
+		pool_id = int(self._data.get('pool_id', 0)) if self._data else 0
 		if self._service.get_id() != pool_id:
 			self._raise_error(500, [
 				MindError(

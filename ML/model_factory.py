@@ -27,6 +27,10 @@ class ModelFactory:
 		'sklearn': {
 			'model': 'SKLearnModel',
 			'module': 'ML.adapters.sklearn_model'
+		},
+		'tensorrt': {
+			'model': 'TRTEngineModel',
+			'module': 'ML.adapters.trt_engine_model'
 		}
 	}
 
@@ -35,6 +39,7 @@ class ModelFactory:
 
 	def get_model(
 			self,
+			id: str,
 			model_file: str,
 			model_type=None,
 			input_filters=None,
@@ -50,7 +55,7 @@ class ModelFactory:
 					[model_type, self.__class__.__name__]
 				)
 			)
-		return model_class(model_file=model_file, input_filters=input_filters, output_filters=output_filters, **params)
+		return model_class(id=id, model_file=model_file, input_filters=input_filters, output_filters=output_filters, **params)
 
 	def get_model_to_file_extension_dictionary(self)->dict:
 		return self.__file_extension_to_model_map

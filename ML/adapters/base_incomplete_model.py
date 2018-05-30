@@ -21,7 +21,6 @@ class BaseIncompleteModel(BaseModel):
 	_params = None
 
 	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
-		self._params = params
 		super().__init__(
 			model_file=model_file,
 			model=model,
@@ -32,9 +31,10 @@ class BaseIncompleteModel(BaseModel):
 		self.__close_model_files()
 
 	def __close_model_files(self):
-		model_file_content = list(self._model_file_content.values())
-		if model_file_content:
-			model_file_content[0].close()
+		if self._model_file_content:
+			model_file_content = list(self._model_file_content.values())
+			if model_file_content:
+				model_file_content[0].close()
 
 	def _get_io_list_from_file(self, io_spec_file_name: str, spec_type: str, error_code: int)->list:
 		try:
@@ -56,8 +56,8 @@ class BaseIncompleteModel(BaseModel):
 		return model_spec.get(spec_type, [])
 
 	def _get_input_list(self)->list:
-		if 'inputs' in self._params:
-			inputs = self._params['inputs']
+		if 'inputs' in self.get_params():
+			inputs = self.get_params()['inputs']
 		else:
 			inputs = self._get_io_list_from_file(
 				INPUT_SPEC_FILE_NAME,
@@ -87,8 +87,8 @@ class BaseIncompleteModel(BaseModel):
 		return model_input.get('shape', [])
 
 	def _get_output_list(self)->list:
-		if 'outputs' in self._params:
-			outputs = self._params['outputs']
+		if 'outputs' in self.get_params():
+			outputs = self.get_params()['outputs']
 		else:
 			outputs = self._get_io_list_from_file(
 				OUTPUT_SPEC_FILE_NAME,
@@ -135,5 +135,3 @@ class BaseIncompleteModel(BaseModel):
 	def is_model_async():
 		raise NotImplementedError('you must to override this!')
 
-	def get_params(self):
-		return self._params

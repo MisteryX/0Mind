@@ -19,6 +19,7 @@ from components.mind_exception import *
 
 
 class BaseModel(ABC):
+	__id = None
 	__errors = None
 	__description = None
 	__inputs = None
@@ -30,11 +31,12 @@ class BaseModel(ABC):
 	__params = None
 
 	@abstractmethod
-	def __init__(self, model_file='', model=None, input_filters=None, output_filters=None, **params):
+	def __init__(self, id: str, model_file='', model=None, input_filters=None, output_filters=None, **params):
 		self.__errors = []
 		self.__description = {}
 		self.__inputs = {}
 		self.__outputs = {}
+		self.__id = id
 		self.__model_file = model_file
 		self.__input_filters = {} if input_filters is None else input_filters
 		self.__output_filters = {} if output_filters is None else output_filters
@@ -45,6 +47,15 @@ class BaseModel(ABC):
 		else:
 			self.__model = model
 		self._describe_model_metadata()
+
+	def get_id(self):
+		return self.__id
+
+	def set_id(self, id: str):
+		self.__id = id
+
+	def get_params(self):
+		return self.__params
 
 	def is_enabled(self):
 		return importlib.util.find_spec(self.get_package_name()) is None

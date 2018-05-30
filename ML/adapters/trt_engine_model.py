@@ -69,12 +69,16 @@ class TRTEngineModel(BaseIncompleteModel):
 		return True
 
 	def get_model_from_file(self, file_name: str):
-		engine_params = self.get_params()
-		if 'PLAN' in engine_params:
+		engine_params = {}
+		if 'PLAN' in self.get_params():
 			self._set_target_framework('PLAN')
 			engine_params['PLAN'] = file_name
-		elif 'framework' in engine_params:
-			self._set_target_framework(engine_params['framework'])
+		elif 'framework' in self.get_params():
+			self._set_target_framework(self.get_params()['framework'])
+			engine_params = ValidationHelper.get_copy_of_dictionary_with_keys(
+				self.get_params(),
+				self.__get_engine_attributes(self.get_params()['framework'])
+			)
 			engine_params['input_nodes'] = self.__get_input_nodes()
 			engine_params['output_nodes'] = self.__get_output_nodes()
 			if 'caffe' == engine_params['framework']:
