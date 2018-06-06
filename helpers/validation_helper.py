@@ -30,3 +30,7 @@ class ValidationHelper:
 			if value is not None:
 				result.append(value)
 		return result
+
+	@staticmethod
+	def get_list_filtered_from_none(input_list: list):
+		return list(filter(lambda item: item is not None, input_list))

@@ -50,11 +50,11 @@ class TRTEngineModel(BaseIncompleteModel):
 	def __get_input_nodes(self)->dict:
 		result = {}
 		for input_ in self._get_input_list():
-			result[input_['name']] = tuple(input_['shape'])
+			result[input_['name']] = tuple(ValidationHelper.get_list_filtered_from_none(input_['shape']))
 		return result
 
 	def __get_output_nodes(self)->list:
-		return ValidationHelper.get_list_of_values_from_list_of_dict(self._get_input_list(), 'name')
+		return ValidationHelper.get_list_of_values_from_list_of_dict(self._get_output_list(), 'name')
 
 	@staticmethod
 	def __get_engine_attributes(engine_name: str)->list:
