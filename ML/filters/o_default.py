@@ -14,7 +14,4 @@ import numpy as np
 
 class DefaultFilter(BaseFilter):
 	def _apply(self):
-		result = self.get_data()
-		if isinstance(result, np.ndarray):
-			result = result.tolist()
-		return result
+		return np.array(self.get_data()).tolist()

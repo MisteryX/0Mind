@@ -101,3 +101,7 @@ class TRTEngineModel(BaseIncompleteModel):
 
 	def _get_prediction(self, data):
 		return self.get_model().infer(data)
+
+	def _before_predict(self, data):
+		result = super()._before_predict(data)
+		return list(result.values())

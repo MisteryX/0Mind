@@ -45,7 +45,7 @@ class ImageFileToNormAndScaledNPArrayFilter(BaseFilter):
 	def __get_images_norm_and_scaled(self, image_file_name: str):
 		_input = self.get_model().get_inputs()[self._input_output_id]
 		input_shape = ValidationHelper.get_list_filtered_from_none(_input['shape'])
-		target_channels = min(input_shape[1:])
+		target_channels = min(input_shape)
 		target_size = tuple(list(filter(lambda item: item != target_channels, input_shape)))
 		if not os.path.isfile(image_file_name) or not os.access(image_file_name, os.R_OK):
 			self.get_model().set_error(MindError(
