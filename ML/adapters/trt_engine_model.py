@@ -104,4 +104,7 @@ class TRTEngineModel(BaseIncompleteModel):
 
 	def _before_predict(self, data):
 		result = super()._before_predict(data)
-		return list(result.values())
+		if not isinstance(result, list):
+			return list(result.values())
+		return result
+
