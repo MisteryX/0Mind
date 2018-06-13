@@ -7,4 +7,8 @@ __license__ = "GPLv3"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
-__all__ = ['adapters', 'filters']
+
+class VersionHelper:
+	@staticmethod
+	def get_current_version()->list:
+		return [1, 1, 0]

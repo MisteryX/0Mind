@@ -4,11 +4,11 @@ __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
 __license__ = "GPLv3"
-__version__ = "1.1.0"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
 from components.base_handler import *
+from helpers.version_helper import VersionHelper
 
 
 class MainHandler(BaseHandler):
@@ -17,7 +17,8 @@ class MainHandler(BaseHandler):
 		return {
 			'service': self.get_service().__class__.__name__,
 			'id': self.get_service().get_id(),
-			'options': self.get_service().get_options()
+			'options': self.get_service().get_options(),
+			'server': VersionHelper.get_current_version()
 		}
 
 	def get(self):
