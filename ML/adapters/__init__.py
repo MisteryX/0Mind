@@ -3,9 +3,8 @@
 __author__ = "Maxim Morskov"
 __copyright__ = "Copyright 2017, Maxim Morskov"
 __credits__ = ["Maxim Morskov"]
-__license__ = "Proprietary"
-__version__ = "0.7.1"
+__license__ = "GPLv3"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
-__all__ = ['base_model.py', 'keras_model']
+__all__ = ['base_model.py']

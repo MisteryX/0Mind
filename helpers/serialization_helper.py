@@ -50,6 +50,11 @@ class SerializationHelper:
 		]
 	}
 
+	__model_file_name_map = {
+		'sklearn': SKLEARN_MODEL_FILE_NAME,
+		'caffe2': CAFFE2_MODEL_INIT_FILE_NAME
+	}
+
 	@staticmethod
 	def save_model(model_type: str, model, file_name, inputs_spec: dict, output_spec: dict):
 		if 'sklearn' == model_type:
@@ -123,7 +128,9 @@ class SerializationHelper:
 	@staticmethod
 	def get_model_content_from_file(file_name: str, model_type: str, params={}):
 		if 'inputs' in params and 'outputs' in params:
-			return {file_name: open(file_name, 'r')}
+			return {
+				SerializationHelper.__model_file_name_map.get(model_type, 'model'): open(file_name, 'rb')
+			}
 		return FileHelper.get_compressed_tar_file_content(
 			file_name,
 			SerializationHelper.get_list_of_model_file_content(model_type, params)
