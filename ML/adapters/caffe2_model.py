@@ -43,6 +43,11 @@ class Caffe2Model(BaseIncompleteModel):
 			Caffe2Model.get_package_name(),
 			self.get_params()
 		)
+		if CAFFE2_MODEL_PREDICT_FILE_NAME in self.get_params():
+			self._model_file_content[CAFFE2_MODEL_PREDICT_FILE_NAME] = open(
+				self.get_params().get(CAFFE2_MODEL_PREDICT_FILE_NAME),
+				'rb'
+			)
 		return workspace.Predictor(
 			self._model_file_content[CAFFE2_MODEL_INIT_FILE_NAME].read(),
 			self._model_file_content[CAFFE2_MODEL_PREDICT_FILE_NAME].read()

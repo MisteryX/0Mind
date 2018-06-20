@@ -143,7 +143,7 @@ class ModelPool(Service):
 
 		return models_count
 
-	def is_model_exists(self, model_id: int) -> bool:
+	def is_model_exists(self, model_id: str) -> bool:
 		return model_id in self.__models
 
 	def get_models(self)->dict:

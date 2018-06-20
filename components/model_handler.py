@@ -17,13 +17,13 @@ class ModelHandler(BaseHandler):
 
 	def prepare(self):
 		self._validate_data(self.request.arguments, self.get_http_attributes(), container_type='HTTP')
-		self._model_id = int(self.get_argument('id'))
+		self._model_id = self.get_argument('id')
 		if not self.get_service().is_model_exists(self.get_model_id()):
 			self._raise_error(
 				404,
 				[MindError(
 					ERROR_CODE_REQUEST_MODEL_NOT_FOUND,
-					'{}: model_id={} not found in pool_id={}',
+					'{}: model_id={} has not found in pool_id={}',
 					[
 						self.__class__.__name__,
 						self.get_model_id(),

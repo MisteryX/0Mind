@@ -8,7 +8,7 @@
 				]
 			},
 			"model_file": "ML/models/mnist_cnn_model.keras",
-			"id": 1,
+			"id": "1",
 			"model_type": "keras",
 			"output_filters": {},
 			"instances": 1
