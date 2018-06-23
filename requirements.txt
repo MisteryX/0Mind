@@ -1,5 +1,3 @@
 numpy
-keras
-tensorflow
 tornado
 psutil

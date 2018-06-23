@@ -1,28 +1,45 @@
-# ML frameworks and models serialization
+# Machine learning frameworks
 
 ## Frameworks
 
 **Keras, Caffe2, Scikit-learn, TensorRT** ML frameworks are fully supported by 0Mind server now.
 
-**TensorRT** can be used only with NVIDIA GPU's with serialized models from engines **caffe, tensorflow, uff, PLAN**
+**TensorRT** can be used only with NVIDIA GPU's with serialized models of engines **caffe, tensorflow, uff, PLAN**
 
 You can easly add support of any ML framework, that has Python 3 bindings,
 using [adapters mechanism](ADAPTERS.MD).
 
-## Model's serialization
-Use your framework's functionality for serialization of the model into one file.
-Optionaly you can use framework name as serialized file's extension for
+## Model serialization and loading
+Use target ML framework functionality for serialization of model into file.
+Optionaly you can use framework name as serialized file extension for
 simplification of 0Mind configuration and model recognition in a file system.
 
 If target ML framework have no tools for model serialization into
 single file or it has no functionality for description of model's interface, required
-by 0Mind, you should do that using [framework adapters](ADAPTERS.MD) and additional structures in
-serialized model files by using **helpers.serialization_helper.SerializationHelper.save_model() method**. Or you can do it manualy. For example...
+by 0Mind, you can do this using [framework adapters](ADAPTERS.MD) with additional structures in
+serialized model files by using **helpers.serialization_helper.SerializationHelper.save_model() method**.
+Or you can use additional task parameters to load model from several files and specify model interface (inputs and outputs).
+
+1. [Keras](#keras)
+1. [Caffe2](#caffe2)
+1. [SciKit learn](#scikit-learn)
+1. [TensorRT](#tensorrt)
+
+### Keras
+This great tool has all required features to serialize and distribute models,
+including interface specification.
+So load Keras models as usual from single file without any special params.
 
 ### Caffe2
 It serializes ML model into files: **init_net.pb**, **predict_net.pb**
 and has no methods to describe model's interface, so we should do it manualy.
-Create files ***input_spec.json*** and ***output_spec.json***. Describe model's
+
+Caffe2 model can be loaded using request like:
+```
+curl -d '{"id": "2", "model_file": "ML/models/init_net.pb", "input_filters": {"data": ["i_img_file_to_caffe2.ImageFileCaffe2Filter"]}, "output_filters": {"default": ["io_argmax.ArgMaxFilter"]}, "model_type": "caffe2", "predict_net.pb": "ML/models/predict_net.pb", "inputs": [{"name": "data", "type": "uint8", "shape": [1, 3, 224, 224]}], "outputs": [{"name": "default", "type": "float64", "shape": [1, 1000]}]}' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
+```
+Or if you prefer to store all information about model in one file,
+create files ***input_spec.json*** and ***output_spec.json***. Describe model's
 inputs in ***input_spec.json*** using format
 ```
 {
@@ -63,10 +80,15 @@ output_spec.json
 ```
 Optionaly you can change result file's extension to **caffe2**.
 Now your model is ready for 0Mind. 
-Alternatively you can use **helpers.serialization_helper.SerializationHelper.save_model()** for model preparing.
+Alternatively you can use **helpers.serialization_helper.SerializationHelper.save_model()** for model preparation.
 
 ### Scikit-learn
-You should use **SerializationHelper** to save model into file. For example:
+To load model you can use request like:
+```
+curl -d '{"id": "2", "output_filters": {}, "model_file": "ML/models/model.jbl", "input_filters": {}, "model_type": "sklearn", "inputs": [{"name": "data", "type": "float64", "shape": [null, 203]}], "outputs": [{"name": "data", "type": "float64", "shape": [null, 1]}] }' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
+```
+Or you should use **SerializationHelper** to save model into one file.
+For example:
 ```
 from helpers.serialization_helper import SerializationHelper
 ...
@@ -80,5 +102,8 @@ SerializationHelper.save_model(
     {'outputs': [{'name': 'default', 'type': 'float32', 'shape': [1, 1]}]}
 )
 ```
+and load it into 0Mind as usual.
 
 ### TensorRT
+This tool has several engines with different set of params for loading models.
+

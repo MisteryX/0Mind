@@ -56,7 +56,7 @@ All other configuration parameters are not necessary and can be skipped.
 It is a list of model pool tasks. This list can be empty.
 In other cases you should specify **required task attributes**:
 
-**id** - (integer) unique model identifier
+**id** - (string) unique model identifier
 
 **model_type** - (string) framework identifier (see ML/adapters/base_model.BaseModel.get_package_name())
 
@@ -67,6 +67,8 @@ that must be applied on input data in specified order
 
 **output_filters** - (dictionary) can be empty or should contain output names with filter list,
 that must be applied on output data in specified order
+
+A lot of auxilary task params are possible. See
 
 ### **Auxilary config params**
 
