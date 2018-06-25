@@ -1,6 +1,6 @@
 # 0Mind API
 
-This REST API based on HTTP protocol with JSON data container.
+REST API based on HTTP protocol with JSON data container.
 
 $HOST - configuration variable "host"
 
@@ -105,7 +105,7 @@ METHODS: GET, POST
 
 HEADERS: None
 
-PARAMS: HTTP:id (integer)
+PARAMS: HTTP:id (string)
 
 RESULT: Loads model into the pool. Returns model's loading statistics or error if fails, for example
 ```
@@ -121,7 +121,7 @@ METHODS: POST
 
 HEADERS: Content-Type: application/json
 
-PARAMS: HTTP:id (integer), JSON:object
+PARAMS: HTTP:id (string), JSON:object
 
 RESULT: Model inference result with applied filters. Input JSON data depends on the model's interface and input filters.
 JSON data should be dictionary with model's inputs names as keys and values formatted according to the interface of the model or input filter.

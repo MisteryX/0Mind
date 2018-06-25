@@ -37,7 +37,7 @@ class TRTEngineModel(BaseIncompleteModel):
 			'tf': ['framework', 'path', 'input_nodes', 'output_nodes'],
 			'uff': ['framework', 'path', 'input_nodes', 'output_nodes'],
 			'caffe': ['framework', 'deployfile', 'modelfile', 'input_nodes', 'output_nodes'],
-			'PLAN': ['PLAN']
+			'PLAN': []
 		}
 
 	def _set_target_framework(self, name: str):
@@ -68,19 +68,26 @@ class TRTEngineModel(BaseIncompleteModel):
 		return True
 
 	def get_model_from_file(self, file_name: str):
-		engine_params = {}
-		if 'PLAN' in self.get_params():
-			self._set_target_framework('PLAN')
+
+		if 'framework' not in self.get_params():
+			raise MindException(MindError(
+				ERROR_CODE_MODEL_TRT_MISSING_ENGINE_ATTRIBUTE,
+				'[{}]: missing engine attribute [{}]',
+				[self.__class__.__name__, 'framework']
+			))
+
+		framework = self.get_params()['framework']
+		self._set_target_framework(framework)
+		engine_params = ValidationHelper.get_copy_of_dictionary_with_keys(
+			self.get_params(),
+			self.__get_engine_attributes(framework)
+		)
+		if 'PLAN' == framework:
 			engine_params['PLAN'] = file_name
-		elif 'framework' in self.get_params():
-			self._set_target_framework(self.get_params()['framework'])
-			engine_params = ValidationHelper.get_copy_of_dictionary_with_keys(
-				self.get_params(),
-				self.__get_engine_attributes(self.get_params()['framework'])
-			)
+		else:
 			engine_params['input_nodes'] = self.__get_input_nodes()
 			engine_params['output_nodes'] = self.__get_output_nodes()
-			if 'caffe' == engine_params['framework']:
+			if 'caffe' == framework:
 				engine_params['modelfile'] = file_name
 				if 'deployfile' not in engine_params:
 					raise MindException(MindError(
@@ -90,12 +97,7 @@ class TRTEngineModel(BaseIncompleteModel):
 					))
 			else:
 				engine_params['path'] = file_name
-		else:
-			raise MindException(MindError(
-				ERROR_CODE_MODEL_TRT_MISSING_ENGINE_ATTRIBUTE,
-				'[{}]: missing engine attribute [{}]',
-				[self.__class__.__name__, 'PLAN/framework']
-			))
+
 		return tensorrt.lite.Engine(**engine_params)
 
 	def _get_prediction(self, data):

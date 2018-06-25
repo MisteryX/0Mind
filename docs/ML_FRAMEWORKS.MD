@@ -24,11 +24,19 @@ Or you can use additional task parameters to load model from several files and s
 1. [Caffe2](#caffe2)
 1. [SciKit learn](#scikit-learn)
 1. [TensorRT](#tensorrt)
+    1. [Tensoflow](#tensorflow)
+    1. [Caffe](#caffe)
+    1. [UFF](#uff)
+    1. [PLAN](#plan)
 
 ### Keras
 This great tool has all required features to serialize and distribute models,
 including interface specification.
+
 So load Keras models as usual from single file without any special params.
+```
+curl -d '{"model_file": "ML/models/mnist_cnn_model.keras", "id": "1", "model_type": "keras", "input_filters": {"conv2d_1_input:0": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
+```
 
 ### Caffe2
 It serializes ML model into files: **init_net.pb**, **predict_net.pb**
@@ -78,8 +86,9 @@ predict_net.pb
 input_spec.json
 output_spec.json
 ```
-Optionaly you can change result file's extension to **caffe2**.
+Optionaly you can change result file extension to **caffe2**.
 Now your model is ready for 0Mind. 
+
 Alternatively you can use **helpers.serialization_helper.SerializationHelper.save_model()** for model preparation.
 
 ### Scikit-learn
@@ -105,5 +114,39 @@ SerializationHelper.save_model(
 and load it into 0Mind as usual.
 
 ### TensorRT
-This tool has several engines with different set of params for loading models.
+This tool has several engines with different set of params for model loading.
 
+You should use "model_type" task param with value **tensorrt**.
+
+Main task param, for TensorRT engine specification is **framework**.
+Use exactly the same framework names as specified in TensorRT documentation.
+
+Of cause, you still need in model interface specification, so specify it using **"inputs"** and **"outputs"** task params.
+
+Model serialization mechanics have been described in TensorRT documentation.
+
+#### Tensorflow
+You can load tensorflow model into TensorRT engine using 0Mind with command like
+
+```
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "tf", "model_file": "/opt/tensorrt/data/mnist/lenet5_mnist_frozen.pb", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+```
+
+#### Caffe
+To load caffe model request should be like
+
+```
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "c1", "model_file": "mnist/mnist.caffemodel", "deployfile": "mnist/mnist.prototxt", "inputs": [{"name": "data", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "prob", "type": "uint32", "shape": [null,1]}], "input_filters": {"data": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+```
+
+#### UFF
+Request example:
+```
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "uff", "model_file": "/opt/tensorrt/data/mnist/lenet5_mnist_frozen.pb", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+```
+
+#### PLAN
+Try something like this
+```
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "PLAN", "model_file": "/opt/tensorrt/data/mnist/mnist.plan", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+```

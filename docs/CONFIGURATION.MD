@@ -68,7 +68,7 @@ that must be applied on input data in specified order
 **output_filters** - (dictionary) can be empty or should contain output names with filter list,
 that must be applied on output data in specified order
 
-A lot of auxilary task params are possible. See
+A lot of auxilary task params are possible. See [FRAMEWORKS SECTION](ML_FRAMEWORKS.MD).
 
 ### **Auxilary config params**
 
