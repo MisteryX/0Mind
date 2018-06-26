@@ -47,7 +47,7 @@ Caffe2 model can be loaded using request like:
 curl -d '{"id": "2", "model_file": "ML/models/init_net.pb", "input_filters": {"data": ["i_img_file_to_caffe2.ImageFileCaffe2Filter"]}, "output_filters": {"default": ["io_argmax.ArgMaxFilter"]}, "model_type": "caffe2", "predict_net.pb": "ML/models/predict_net.pb", "inputs": [{"name": "data", "type": "uint8", "shape": [1, 3, 224, 224]}], "outputs": [{"name": "default", "type": "float64", "shape": [1, 1000]}]}' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
 ```
 Or if you prefer to store all information about model in one file,
-create files ***input_spec.json*** and ***output_spec.json***. Describe model's
+create files ***input_spec.json*** and ***output_spec.json***. Describe model
 inputs in ***input_spec.json*** using format
 ```
 {
@@ -94,7 +94,7 @@ Alternatively you can use **helpers.serialization_helper.SerializationHelper.sav
 ### Scikit-learn
 To load model you can use request like:
 ```
-curl -d '{"id": "2", "output_filters": {}, "model_file": "ML/models/model.jbl", "input_filters": {}, "model_type": "sklearn", "inputs": [{"name": "data", "type": "float64", "shape": [null, 203]}], "outputs": [{"name": "data", "type": "float64", "shape": [null, 1]}] }' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
+curl -d '{"id": "2", "model_type": "sklearn", "model_file": "ML/models/model.jbl", "input_filters": {}, "output_filters": {}, "inputs": [{"name": "data", "type": "float64", "shape": [null, 203]}], "outputs": [{"name": "data", "type": "float64", "shape": [null, 1]}] }' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
 ```
 Or you should use **SerializationHelper** to save model into one file.
 For example:
@@ -133,20 +133,20 @@ curl -d '{"id": "2", "model_type": "tensorrt", "framework": "tf", "model_file": 
 ```
 
 #### Caffe
-To load caffe model request should be like
+To load caffe model, request should be like this
 
 ```
-curl -d '{"id": "2", "model_type": "tensorrt", "framework": "c1", "model_file": "mnist/mnist.caffemodel", "deployfile": "mnist/mnist.prototxt", "inputs": [{"name": "data", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "prob", "type": "uint32", "shape": [null,1]}], "input_filters": {"data": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "caffe", "model_file": "mnist/mnist.caffemodel", "deployfile": "mnist/mnist.prototxt", "inputs": [{"name": "data", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "prob", "type": "uint32", "shape": [null,1]}], "input_filters": {"data": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
 ```
 
 #### UFF
 Request example:
 ```
-curl -d '{"id": "2", "model_type": "tensorrt", "framework": "uff", "model_file": "/opt/tensorrt/data/mnist/lenet5_mnist_frozen.pb", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "uff", "model_file": "/opt/tensorrt/data/mnist/lenet5_mnist_frozen.pb", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
 ```
 
 #### PLAN
-Try something like this
+Request example:
 ```
-curl -d '{"id": "2", "model_type": "tensorrt", "framework": "PLAN", "model_file": "/opt/tensorrt/data/mnist/mnist.plan", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}}, "output_filters": {}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
+curl -d '{"id": "2", "model_type": "tensorrt", "framework": "PLAN", "model_file": "/opt/tensorrt/data/mnist/mnist.plan", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load
 ```

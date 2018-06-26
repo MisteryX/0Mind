@@ -1,1 +1,2 @@
+#! /bin/bash
 curl -d '{"id": "2", "model_file": "ML/models/bvlc_googlenet.caffe2", "input_filters": {"data": ["i_img_file_to_caffe2.ImageFileCaffe2Filter"]}, "output_filters": {"default": ["io_argmax.ArgMaxFilter"]}, "model_type": "caffe2"}' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load

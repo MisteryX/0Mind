@@ -18,7 +18,7 @@ class MainHandler(BaseHandler):
 			'service': self.get_service().__class__.__name__,
 			'id': self.get_service().get_id(),
 			'options': self.get_service().get_options(),
-			'server': VersionHelper.get_current_version()
+			'version': VersionHelper.get_current_version()
 		}
 
 	def get(self):

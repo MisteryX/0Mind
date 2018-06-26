@@ -36,7 +36,7 @@ class TRTEngineModel(BaseIncompleteModel):
 		return {
 			'tf': ['framework', 'path', 'input_nodes', 'output_nodes'],
 			'uff': ['framework', 'path', 'input_nodes', 'output_nodes'],
-			'caffe': ['framework', 'deployfile', 'modelfile', 'input_nodes', 'output_nodes'],
+			'c1': ['framework', 'deployfile', 'modelfile', 'input_nodes', 'output_nodes'],
 			'PLAN': []
 		}
 
@@ -87,7 +87,7 @@ class TRTEngineModel(BaseIncompleteModel):
 		else:
 			engine_params['input_nodes'] = self.__get_input_nodes()
 			engine_params['output_nodes'] = self.__get_output_nodes()
-			if 'caffe' == framework:
+			if 'c1' == framework:
 				engine_params['modelfile'] = file_name
 				if 'deployfile' not in engine_params:
 					raise MindException(MindError(

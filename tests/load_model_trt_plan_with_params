@@ -1,0 +1,2 @@
+#! /bin/bash
+curl -d '{"id": "3", "model_type": "tensorrt", "framework": "PLAN", "model_file": "/tmp/caffe_lenet5_mnist.plan", "inputs": [{"name": "in", "type": "float32", "shape": [null,1,28,28]}], "outputs": [{"name": "out", "type": "uint32", "shape": [null,1]}], "input_filters": {"in": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}' -H "Content-Type:application/json" -X POST 127.0.0.1:5885/model/load

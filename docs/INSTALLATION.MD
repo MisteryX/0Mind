@@ -20,6 +20,6 @@ conda install --yes --file requirements.txt
 ```
 
 ## Frameworks
-0Mind supports [lots of ML frameworks](ML_FRAMEWORKS.MD), but in production environment usually used one or two,
+0Mind supports [a lot of ML frameworks](ML_FRAMEWORKS.MD), but in production environment usually are used one or two,
 so we don't include all supported frameworks to requirements file. 
 To activate support of particular framework in 0Mind, you should install and configure required tool manually.

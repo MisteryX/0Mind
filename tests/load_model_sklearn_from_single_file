@@ -1,1 +1,2 @@
+#! /bin/bash
 curl -d '{"id": "2", "output_filters": {}, "model_file": "ML/models/sk_log_reg_model.sklearn", "input_filters": {}, "model_type": "sklearn"}' -H "Content-Type:application/json" -X POST http://127.0.0.1:5885/model/load
