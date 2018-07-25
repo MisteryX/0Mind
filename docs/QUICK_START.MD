@@ -16,7 +16,10 @@ and specify real location of your prepared model for example:
         {
             "id": 1,
             "model_type": "caffe2",
-            "model_file": "ML/models/bvlc_alexnet.caffe2",
+            "model_file": "ML/models/init_net.pb",
+            "predict_net.pb": "ML/models/predict_net.pb", 
+            "inputs": [{"name": "data", "type": "uint8", "shape": [1, 3, 224, 224]}], 
+            "outputs": [{"name": "default", "type": "float64", "shape": [1, 1000]}],
             "input_filters": {
                 "data": ["i_img_file_to_caffe2.ImageFileCaffe2Filter"]
             },
