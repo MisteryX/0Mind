@@ -11,4 +11,4 @@ __email__ = "0mind@inbox.ru"
 class VersionHelper:
 	@staticmethod
 	def get_current_version()->list:
-		return [1, 1, 0]
+		return [1, 1, 1]

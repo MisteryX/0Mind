@@ -2,19 +2,18 @@
 	"id": 1,
 	"tasks": [
 		{
+			"id": "1",
+			"model_file": "ML/models/mnist_cnn_model.keras",
+			"model_type": "keras",
 			"input_filters": {
 				"conv2d_1_input:0": [
 					"i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"
 				]
 			},
-			"model_file": "ML/models/mnist_cnn_model.keras",
-			"id": "1",
-			"model_type": "keras",
-			"output_filters": {},
-			"instances": 1
+			"output_filters": {}
 		}
 	],
 	"port": 5885,
 	"host": "127.0.0.1",
-	"debug": true
+	"debug": false
 }

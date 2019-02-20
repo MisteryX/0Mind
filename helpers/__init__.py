@@ -8,16 +8,3 @@ __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
 __all__ = []
-
-import pkgutil
-import inspect
-
-for loader, name, is_pkg in pkgutil.walk_packages(__path__):
-    _module = loader.find_module(name).load_module(name)
-
-    for _name, value in inspect.getmembers(_module):
-        if _name.startswith('__'):
-            continue
-
-        globals()[name] = value
-        __all__.append(name)
