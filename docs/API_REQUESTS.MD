@@ -31,7 +31,7 @@ for example
 ```
 curl http://127.0.0.1:5885/info
 
-{"service": "ModelPool", "id": 1, "options": {"model_types": ["keras"], "debug": false}}
+{"service": "ModelPool", "id": 1, "options": {"model_types": ["keras"], "debug": false}, "version": [1, 1, 3]}
 ```
 
 ## INFO-SYSTEM
