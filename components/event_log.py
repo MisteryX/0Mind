@@ -7,17 +7,12 @@ __license__ = "GPLv3"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
-try:
-	import redis
-except ImportError as e:
-	pass
+
 import argparse
 import json
 from helpers.file_helper import *
 import logging as log
 from logging import config
-from datetime import *
-import os
 
 DEFAULT_CONFIG_FILE = 'configs/logger.json'
 
@@ -56,9 +51,6 @@ class EventLog:
 
 	def get_config(self):
 		return self.__config
-
-	def __get_redis_key(self):
-		return 'status_' + self.get_name()
 
 
 def get_params_using_parser(args: list):
