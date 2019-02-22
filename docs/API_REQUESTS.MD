@@ -10,6 +10,8 @@ Available HTTP actions are:
 
 1. [http://$HOST:$PORT/info](#info)
 1. [http://$HOST:$PORT/info/system](#info-system)
+1. [http://$HOST:$PORT/info/task](#info_task)
+1. [http://$HOST:$PORT/info/tasks](#info_tasks)
 1. [http://$HOST:$PORT/model/list](#model-list)
 1. [http://$HOST:$PORT/model/info](#model-info)
 1. [http://$HOST:$PORT/model/load](#model-load)
@@ -48,6 +50,38 @@ RESULT: Returns system information about 0Mind skill server's environment, for e
 curl http://127.0.0.1:5885/info/system
 
 {"id": 1, "cpu_usage": 1.3, "memory": {"total": 8271306752, "available": 2798899200, "percent": 66.2, "used": 4734496768, "free": 1093509120, "active": 4851269632, "inactive": 1893675008, "buffers": 310255616, "cached": 2133045248, "shared": 426766336}, "python": [3, 6, 4, "final", 0]}
+```
+
+## INFO-TASK
+URL: http://$HOST:$PORT/info/task
+
+METHODS: GET, POST
+
+HEADERS: None
+
+PARAMS: HTTP:id(string)
+
+RESULT: Returns information about task with specified model_id
+```
+curl http://127.0.0.1:5885/info/task?id=1
+
+{"id": "1", "model_file": "ML/models/mnist_cnn_model.keras", "model_type": "keras", "input_filters": {"conv2d_1_input:0": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}
+```
+
+## INFO-TASKS
+URL: http://$HOST:$PORT/info/tasks
+
+METHODS: GET, POST
+
+HEADERS: None
+
+PARAMS: None
+
+RESULT: Returns information about 0Mind tasks
+```
+curl http://127.0.0.1:5885/info/tasks
+
+{"id": 1, "tasks": [{"id": "1", "model_file": "ML/models/mnist_cnn_model.keras", "model_type": "keras", "input_filters": {"conv2d_1_input:0": ["i_img_file_to_ns_arr.ImageFileToNormAndScaledNPArrayFilter"]}, "output_filters": {}}]}
 ```
 
 ## MODEL-LIST

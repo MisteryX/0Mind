@@ -7,17 +7,21 @@ __license__ = "GPLv3"
 __maintainer__ = "Maxim Morskov"
 __email__ = "0mind@inbox.ru"
 
-from components.model_handler import *
+from components.base_handler import *
 
 
-class TaskInfoHandler(ModelHandler):
+class TasksInfoHandler(BaseHandler):
 
-	def __get_task_info(self):
-		self.write(self.get_service().get_task(self.get_model_id()))
+	def __get_tasks_info(self):
+		result = {
+			'id': self.get_service().get_id(),
+			'tasks': self.get_service().get_tasks()
+		}
+		self.write(result)
 		self.finish()
 
 	def get(self):
-		self.__get_task_info()
+		self.__get_tasks_info()
 
 	def post(self):
-		self.__get_task_info()
+		self.__get_tasks_info()

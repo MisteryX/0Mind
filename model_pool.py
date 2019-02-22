@@ -19,6 +19,7 @@ from components.mind_exception import *
 from request_handlers.core.main_handler import *
 from request_handlers.core.system_info_handler import *
 from request_handlers.core.task_info_handler import *
+from request_handlers.core.tasks_info_handler import *
 from request_handlers.model_pool.model_predict_handler import *
 from request_handlers.model_pool.model_load_handler import *
 from request_handlers.model_pool.model_drop_handler import *
@@ -44,6 +45,7 @@ class ModelPool(Service):
 			[
 				(r"/info", MainHandler, {'service': self}),
 				(r"/info/system", SystemInfoHandler, {'service': self}),
+				(r"/info/task", TaskInfoHandler, {'service': self}),
 				(r"/info/tasks", TasksInfoHandler, {'service': self}),
 				(r"/model/predict", ModelPredictHandler, {'service': self}),
 				(r"/model/list", ModelListHandler, {'service': self}),

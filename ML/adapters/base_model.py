@@ -15,6 +15,7 @@ from helpers.file_helper import FileHelper
 from helpers.module_helper import ModuleHelper
 from ML.filters.o_default import DefaultFilter
 from components.mind_exception import *
+import numpy as np
 
 
 class BaseModel(ABC):
@@ -181,25 +182,29 @@ class BaseModel(ABC):
 		output_filters = self.get_output_filters()
 
 		for output_id, output_ in self.get_outputs().items():
-			__prediction = self._get_data_for_filter(
-				self.__get_prediction_from_model_output(predictions, output_id, output_['name']),
+			result[output_['name']] = []
+
+			__predictions = self._get_data_for_filter(
+				self.__get_prediction_from_model_output(predictions, output_id, output_),
 				filter_type='output'
 			)
+
 			if output_['name'] in output_filters and (predictions is not None and len(predictions) != 0):
-				__filter = output_filters[output_['name']]
-				result[output_['name']] = self._run_filters_pipeline(
-					__filter,
-					output_id,
-					__prediction,
-					filter_type='output'
-				)
+				for __prediction in __predictions:
+					__filter = output_filters[output_['name']]
+					result[output_['name']].append(self._run_filters_pipeline(
+						__filter,
+						output_id,
+						__prediction,
+						filter_type='output'
+					))
 			else:
-				result[output_['name']] = DefaultFilter(a_data=__prediction, a_input_output_id=output_id, a_model=self).apply()
+				result[output_['name']] = DefaultFilter(a_data=__predictions, a_input_output_id=output_id, a_model=self).apply()
 		return result
 
 	def predict(self, features):
 		data = self._before_predict(features)
-		if data is None or len(data) == 0:
+		if data is None or len(data) == 0 or self.has_errors():
 			return
 		predictions = self._get_prediction(data)
 		predictions = self._after_predict(predictions)
@@ -207,9 +212,9 @@ class BaseModel(ABC):
 
 	def __get_prediction_from_model_output(self, predictions, output_id: int, output: dict):
 		if type(predictions) is list:
-			if len(predictions) == 1:
-				return predictions[0]
-			elif output_id < len(predictions):
+			if output['shape'][0] != 1 and output_id < len(predictions):
+				return predictions
+			elif output['shape'][0] == 1 and output_id < len(predictions):
 				return predictions[output_id]
 			else:
 				self.set_error(MindError(
@@ -217,6 +222,11 @@ class BaseModel(ABC):
 					'{}: Can`t determine output id for model prediction',
 					[self.__class__.__name__]
 				))
+		elif type(predictions) is np.ndarray:
+			if output['shape'][0] != 1 and output_id < len(predictions):
+				return predictions.tolist()
+			elif output['shape'][0] == 1 and output_id < len(predictions):
+				return predictions.tolist()[output_id]
 		elif type(predictions) is dict:
 			if output['name'] not in predictions:
 				self.set_error(MindError(

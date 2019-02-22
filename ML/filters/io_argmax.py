@@ -13,4 +13,9 @@ import numpy as np
 
 class ArgMaxFilter(BaseFilter):
 	def _apply(self):
-		return int(np.argmax(self.get_data()))
+		data = self.get_data()
+		if type(data) is np.ndarray:
+			return int(np.argmax(data))
+		elif type(data) is list:
+			return int(np.argmax(np.array(data)))
+		return data

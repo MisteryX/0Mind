@@ -128,6 +128,12 @@ class Service(ABC):
 	def get_tasks(self)->list:
 		return self._tasks
 
+	def get_task(self, model_id: str)->dict:
+		for __task in list(self._tasks):
+			if __task['id'] == model_id:
+				return __task
+		return {}
+
 	def append_task(self, task: dict):
 		self._tasks.append(task)
 
