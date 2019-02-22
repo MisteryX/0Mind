@@ -10,8 +10,8 @@ Available HTTP actions are:
 
 1. [http://$HOST:$PORT/info](#info)
 1. [http://$HOST:$PORT/info/system](#info-system)
-1. [http://$HOST:$PORT/info/task](#info_task)
-1. [http://$HOST:$PORT/info/tasks](#info_tasks)
+1. [http://$HOST:$PORT/info/task](#info-task)
+1. [http://$HOST:$PORT/info/tasks](#info-tasks)
 1. [http://$HOST:$PORT/model/list](#model-list)
 1. [http://$HOST:$PORT/model/info](#model-info)
 1. [http://$HOST:$PORT/model/load](#model-load)
